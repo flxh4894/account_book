@@ -4,7 +4,10 @@ class CommonUtils {
 
   final formatCurrency = new NumberFormat.simpleCurrency(locale: 'ko-KR', name: '', decimalDigits: 0);
 
-  DateTime convertDateTime(String year, String month, String day){
+  DateTime convertDateTime(String date){
+    var year = date.substring(0,4);
+    var month = date.substring(4,6);
+    var day = date.substring(6,8);
     return DateTime(int.parse(year), int.parse(month), int.parse(day));
   }
 
