@@ -1,3 +1,5 @@
+import 'package:accountbook/src/controller/cost_controller.dart';
+import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/page/bottom_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +32,6 @@ class MyApp extends StatelessWidget {
 
     return GetMaterialApp(
       title: '자산을 늘려라',
-      smartManagement: SmartManagement.onlyBuilder,
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -49,6 +50,10 @@ class MyApp extends StatelessWidget {
           )
         ),
       ),
+      initialBinding: BindingsBuilder(() {
+        Get.put(UtilController());
+        Get.put(CostController());
+      }),
       home: BottomNavigationPage()
     );
   }

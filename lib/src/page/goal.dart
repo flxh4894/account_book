@@ -1,5 +1,6 @@
 import 'package:accountbook/src/style/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class GoalPage extends StatelessWidget {
 
@@ -8,7 +9,9 @@ class GoalPage extends StatelessWidget {
   Widget _body() {
     return Column(
       children: [
-        goalInfo()
+        goalInfo(),
+        TextButton(onPressed: () {
+        }, child: Text('하나 더 찾아보자'))
       ],
     );
   }
@@ -19,7 +22,8 @@ class GoalPage extends StatelessWidget {
       child: Column(
         children: [
           Text('2021년 목표 달성 금액 : 21,000,000원 ', style: TextStyle(fontSize: 16)),
-
+          TextButton(onPressed: () {
+          }, child: Text('??????????????'))
         ],
       )
     );

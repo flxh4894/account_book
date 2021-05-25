@@ -1,8 +1,13 @@
 class CategoryInfo {
-  final int type;
-  final int percent;
+  final int category;
   final int price;
-  final String text;
+  final String name;
 
-  CategoryInfo({this.type, this.percent, this.text, this.price});
+  CategoryInfo({this.category, this.name, this.price});
+
+  factory CategoryInfo.fromJson(Map<String, dynamic> json) => CategoryInfo(
+    category: json['category'],
+    price: json['price'],
+    name: json['name']
+  );
 }

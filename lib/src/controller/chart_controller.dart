@@ -1,12 +1,20 @@
 import 'dart:ui';
 
+import 'package:accountbook/src/helper/db_helper.dart';
 import 'package:accountbook/src/model/category_info.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sqflite/sqflite.dart';
 
 enum CategoryType {Income, Expense}
 
 class ChartController extends GetxController {
+  static Database _database;
+  Future<Database> get database async {
+    if (_database != null) return _database;
+    _database = await DatabaseHelper().database;
+    return _database;
+  }
 
   final List<Color> colors = [
     Color(0xffffafb0),
@@ -24,25 +32,41 @@ class ChartController extends GetxController {
   RxList<CategoryInfo> incomeList = <CategoryInfo>[].obs;
   RxInt totalIncome = 0.obs;
 
+  // 날짜 (현재일 기본값)
+  Rx<DateTime> _date = DateTime.now().obs;
+  DateTime get date => _date.value;
+
+  // 월 변경
+  void changeDate(int count) {
+    int daysInMonth(DateTime date){
+      var firstDayThisMonth = new DateTime(date.year, date.month, date.day);
+      var firstDayNextMonth = new DateTime(firstDayThisMonth.year, firstDayThisMonth.month + count, firstDayThisMonth.day);
+      return firstDayNextMonth.difference(firstDayThisMonth).inDays;
+    }
+    _date( _date.value.add(Duration(days: daysInMonth(_date.value))) );
+  }
 
   @override
   void onInit() {
-    getExpenseList();
-    getIncomeList();
+    getExpenseList(DateTime.now());
+    getIncomeList(DateTime.now());
     super.onInit();
   }
 
   // 카테고리별 내역 가져오기
-  void getExpenseList() async {
-    expenseList.addAll([
-      CategoryInfo(type: 1, percent: 20, text: '식품', price: 250000),
-      CategoryInfo(type: 2, percent: 10, text: '생활용품', price: 120000),
-      CategoryInfo(type: 3, percent: 15, text: '취미생활', price: 170000),
-      CategoryInfo(type: 4, percent: 15, text: '여가생활', price: 170000),
-      CategoryInfo(type: 5, percent: 27, text: '전자제품', price: 320000),
-      CategoryInfo(type: 6, percent: 13, text: '통신비', price: 43000),
-    ]);
-    
+  void getExpenseList(DateTime date) async {
+    final db = await database;
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
+
+    var list = await db.rawQuery("SELECT sum(A.price) AS price, A.category, B.name " +
+        "FROM daily_cost A, category B " +
+        "WHERE A.category = B.id AND B.type = 2 AND A.date BETWEEN '${yearMonth}01' AND '${yearMonth}31' " +
+        "GROUP BY A.category " +
+        "ORDER BY price DESC");
+
+    expenseList(list.map((e) => CategoryInfo.fromJson(e)).toList() );
     setTotalExpense();
   }
   
@@ -55,11 +79,19 @@ class ChartController extends GetxController {
     totalExpense(total);
   }
 
-  void getIncomeList() async {
-    incomeList.addAll([
-      CategoryInfo(type: 99, percent: 20, text: '근로소득', price: 4500000),
-      CategoryInfo(type: 99, percent: 20, text: '투자소득', price: 1250000),
-    ]);
+  void getIncomeList(DateTime date) async {
+    final db = await database;
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
+
+    var list = await db.rawQuery("SELECT sum(A.price) AS price, A.category, B.name " +
+        "FROM daily_cost A, category B " +
+        "WHERE A.category = B.id AND B.type = 1 AND A.date BETWEEN '${yearMonth}01' AND '${yearMonth}31' " +
+        "GROUP BY A.category " +
+        "ORDER BY price DESC");
+
+    incomeList( list.map((e) => CategoryInfo.fromJson(e)).toList() );
     setTotalIncome();
   }
 

@@ -2,35 +2,25 @@ import 'package:accountbook/src/component/datePicker.dart';
 import 'package:accountbook/src/component/list_row.dart';
 import 'package:accountbook/src/controller/chart_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
+import 'package:accountbook/src/model/category_info.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
-import 'chart/indicator.dart';
 
-class ChartPage extends StatefulWidget {
-  @override
-  _ChartPageState createState() => _ChartPageState();
-}
-
-class _ChartPageState extends State<ChartPage> {
-  final UtilController _utilController = Get.put(UtilController());
+class ChartPage extends StatelessWidget {
+  final UtilController _utilController = Get.find<UtilController>();
   final ChartController _chartController = Get.put(ChartController());
   final CommonUtils _utils = CommonUtils();
-  int touchedIndex = -1;
-  List<Color> colors;
-
-  @override
-  void initState() {
-    colors = _chartController.colors;
-    super.initState();
-  }
 
   Widget _body() {
     return TabBarView(
         children: [
+          _chartController.expenseList.length == 0
+          ? Center(
+            child: Text('데이터가 없습니다.'),
+          ) :
           SingleChildScrollView(
             child: Column(
               children: [
@@ -40,6 +30,10 @@ class _ChartPageState extends State<ChartPage> {
               ],
             ),
           ),
+          _chartController.incomeList.length == 0
+              ? Center(
+            child: Text('데이터가 없습니다.'),
+          ) :
           SingleChildScrollView(
             child: Column(
               children: [
@@ -54,23 +48,33 @@ class _ChartPageState extends State<ChartPage> {
   }
 
   Widget datePicker() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-              icon: Icon(Icons.chevron_left, size: 30),
-              onPressed: () => _utilController.changeDate(-1)),
-          DatePickerComponent(
-              now: DateTime.now(), fontColor: Colors.black, fontSize: 18),
-          IconButton(
-              icon: Icon(Icons.chevron_right, size: 30),
-              onPressed: () => _utilController.changeDate(1)),
-        ],
+    return Obx(
+      () => Container(
+        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                icon: Icon(Icons.chevron_left, size: 30),
+                onPressed: () {
+                  _chartController.changeDate(-1);
+                  _chartController.getExpenseList(_chartController.date);
+                  _chartController.getIncomeList(_chartController.date);
+                }),
+            Text(_utils.getYearMonth(_chartController.date),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold) ),
+            IconButton(
+                icon: Icon(Icons.chevron_right, size: 30),
+                onPressed: () {
+                  _chartController.changeDate(1);
+                  _chartController.getExpenseList(_chartController.date);
+                  _chartController.getIncomeList(_chartController.date);
+                }),
+          ],
+        ),
       ),
     );
   }
@@ -110,8 +114,8 @@ class _ChartPageState extends State<ChartPage> {
       child: Column(
         children: [
           ListRowComponent('5월 총액', total, 1),
-          for(var category in list)
-            ListRowComponent(category.text, category.price * flag, 1)
+          for(CategoryInfo category in list)
+            ListRowComponent(category.name, category.price * flag, 1)
         ],
       ),
     );
@@ -131,9 +135,9 @@ class _ChartPageState extends State<ChartPage> {
       final radius = 80.0;
 
       return PieChartSectionData(
-        color: colors[i],
+        color: _chartController.colors[i],
         value: _chartController.getCategoryPercent(i, type),
-        title: '${categories[i].text} \n ${_chartController.getCategoryPercent(i, type)}%',
+        title: '${categories[i].name} ${_chartController.getCategoryPercent(i, type)}%',
         radius: radius,
         titleStyle: TextStyle(
             fontSize: fontSize,color: Colors.black),
@@ -169,7 +173,7 @@ class _ChartPageState extends State<ChartPage> {
             ),
           ),
         ),
-        body: _body(),
+        body: Obx(() => _body()),
       ),
     );
   }

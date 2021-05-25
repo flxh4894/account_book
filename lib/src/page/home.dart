@@ -1,5 +1,5 @@
 import 'package:accountbook/src/component/datePicker.dart';
-import 'package:accountbook/src/controller/asset_controller.dart';
+import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/page/chart.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
@@ -14,10 +14,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final CommonUtils _utils = CommonUtils();
-
-  final AssetController _assetController = Get.put(AssetController());
-
-  final UtilController _utilController = Get.put(UtilController());
+  final CostController _costController = Get.find<CostController>();
+  final UtilController _utilController = Get.find<UtilController>();
 
   Widget _body() {
     return Container(
@@ -26,7 +24,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             myData(),
             datePicker(),
-            for (var asset in _assetController.assetList)
+            for (var asset in _costController.assetList)
               listRow(asset['title'], asset['money'], asset['id'])
           ],
         ),
@@ -46,7 +44,7 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('이번 달 ${_utils.priceFormat(_assetController.total.value)}',
+                Text('이번 달 ${_utils.priceFormat(_costController.monthTotal.value)}',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Text(
@@ -89,12 +87,18 @@ class _HomePageState extends State<HomePage> {
         children: [
           IconButton(
               icon: Icon(Icons.chevron_left, size: 30),
-              onPressed: () => _utilController.changeDate(-1)),
+              onPressed: () {
+                _utilController.changeDate(-1);
+                _costController.getMonthCostContent(_utilController.date);
+              }),
           DatePickerComponent(
               now: DateTime.now(), fontColor: Colors.black, fontSize: 18),
           IconButton(
               icon: Icon(Icons.chevron_right, size: 30),
-              onPressed: () => _utilController.changeDate(1)),
+              onPressed: () {
+                _utilController.changeDate(1);
+                _costController.getMonthCostContent(_utilController.date);
+              }),
         ],
       ),
     );
