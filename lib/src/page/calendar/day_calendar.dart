@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 class DailyCalendarPage extends StatelessWidget {
 
-  final CostController _costController = Get.put(CostController());
+  final CostController _costController = Get.find<CostController>();
   final CommonUtils _utils = CommonUtils();
 
   Widget _dayListTile(String day, List<DailyCost> list) {
@@ -28,6 +28,7 @@ class DailyCalendarPage extends StatelessWidget {
     } else if(now.weekday == 7){
       color = Colors.red;
     }
+
     return Container(
       color: Colors.white,
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
@@ -43,7 +44,8 @@ class DailyCalendarPage extends StatelessWidget {
               children: [
                 Text('${_utils.getYearMonth(now)}',
                     style: TextStyle(
-                        fontSize: 14, color: Colors.black.withOpacity(0.5))),
+                        fontSize: 14, color: Colors.black.withOpacity(0.5))
+                ),
                 Container(
                   decoration: BoxDecoration(
                       color: color ,
@@ -63,12 +65,12 @@ class DailyCalendarPage extends StatelessWidget {
         ),
         Divider(),
         for(var content in list)
-          contentDetail(content.category, content.title, content.price)
+          contentDetail(content)
       ]),
     );
   }
 
-  Widget contentDetail(String category, String title, int price) {
+  Widget contentDetail(DailyCost content) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -76,24 +78,24 @@ class DailyCalendarPage extends StatelessWidget {
         children: [
           Container(
               width: 80,
-              child: Text(category,
+              child: Text(content.category,
                   style: TextStyle(color: Colors.black.withOpacity(0.5))
               )
           ),
-          Container(
-            width: 150,
+          SizedBox(width: 30),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, overflow: TextOverflow.ellipsis),
-                Text('오후 13:30 삼성카드',
+                Text(content.title, overflow: TextOverflow.ellipsis),
+                Text('${content.date.substring(8,10)}:${content.date.substring(10,12)} 삼성카드',
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.5), fontSize: 12)
                 ),
               ],
             ),
           ),
-          Text('${_utils.priceFormat(price)}', style: TextStyle(color: Colors.blue))
+          Text('${_utils.priceFormat(content.price)}', style: TextStyle(color: content.type == 1 ? Colors.red : Colors.blue))
         ],
       ),
     );
@@ -101,15 +103,24 @@ class DailyCalendarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RxMap<String, List<DailyCost>> dailyCostList = _costController.dailyCostList;
-    List<String> keys = dailyCostList.keys.toList();
     return Obx(
       () => Container(
-        child: ListView.builder(
-            itemCount: dailyCostList.length,
-            itemBuilder: (context, index) {
-              return _dayListTile(keys[index], dailyCostList[keys[index]]);
-            }),
+        child: _costController.dailyCostList.length == 0 ?
+        Center(child: Text('데이터가 없습니다.'),) :
+        ListView.builder(
+          itemCount: _costController.dailyCostList.length,
+          itemBuilder: (context, index) {
+            List<String> keys = _costController.dailyCostList.keys.toList();
+
+            if(index != _costController.dailyCostList.length - 1)
+              return _dayListTile(keys[index], _costController.dailyCostList[keys[index]]);
+            else
+              return Container(
+                margin: EdgeInsets.only(bottom: 50),
+                child: _dayListTile(keys[index], _costController.dailyCostList[keys[index]])
+              );
+          }
+        ),
       ),
     );
   }

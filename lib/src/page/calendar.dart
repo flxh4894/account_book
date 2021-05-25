@@ -1,6 +1,10 @@
 import 'package:accountbook/src/component/datePicker.dart';
+import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/page/calendar/day_calendar.dart';
+import 'package:accountbook/src/page/calendar/month_calendar.dart';
+import 'package:accountbook/src/page/new_cost.dart';
+import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -12,6 +16,8 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   final UtilController _utilController = Get.find<UtilController>();
+  final CostController _costController = Get.put(CostController());
+  final CommonUtils _utils = CommonUtils();
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
@@ -23,14 +29,47 @@ class _CalendarPageState extends State<CalendarPage> {
       backgroundColor: Colors.white,
       title: datePicker(),
       bottom: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: TabBar(
-          indicatorColor: Theme.of(context).primaryColor,
-          labelStyle: TextStyle(fontSize: 16),
-          tabs: [
-            Tab(text: '일별' ),
-            Tab(text: '달력'),
-          ],
+        preferredSize: Size.fromHeight(kToolbarHeight+50),
+        child: Column(
+          children: [
+            TabBar(
+              indicatorColor: Theme.of(context).primaryColor,
+              labelStyle: TextStyle(fontSize: 16),
+              tabs: [
+                Tab(text: '일별' ),
+                Tab(text: '달력'),
+              ],
+            ),
+            Obx(
+              () => Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                color: Colors.white,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      children: [
+                        Text('수입'),
+                        Text('${_utils.priceFormat(_costController.monthTotalPlus.value)}', style: TextStyle(color: Colors.red),),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text('지출'),
+                        Text('${_utils.priceFormat(_costController.monthTotalMinus.value)}', style: TextStyle(color: Colors.blue)),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text('합계'),
+                        Text('${_utils.priceFormat(_costController.monthTotalPlus.value - _costController.monthTotalMinus.value)}'),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ]
         ),
       ),
     );
@@ -47,54 +86,22 @@ class _CalendarPageState extends State<CalendarPage> {
         children: [
           IconButton(
               icon: Icon(Icons.chevron_left, size: 30),
-              onPressed: () => _utilController.changeDate(-1)),
+              onPressed: () {
+                _utilController.changeDate(-1);
+                _costController.getMonthCostContent(_utilController.date);
+              },
+          ),
           DatePickerComponent(
               now: DateTime.now(), fontColor: Colors.black, fontSize: 18),
           IconButton(
               icon: Icon(Icons.chevron_right, size: 30),
-              onPressed: () => _utilController.changeDate(1)),
+              onPressed: () {
+                _utilController.changeDate(1);
+                _costController.getMonthCostContent(_utilController.date);
+              },
+          )
         ],
       ),
-    );
-  }
-
-  Widget _calendar() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: TableCalendar(
-        locale: 'ko-KR',
-        daysOfWeekHeight: 30,
-        firstDay: DateTime.utc(2010, 1, 1),
-        lastDay: DateTime.utc(2099, 12, 31),
-        headerVisible: false,
-        shouldFillViewport: true,
-        availableGestures: null,
-        availableCalendarFormats: const {
-          CalendarFormat.month: '주',
-          CalendarFormat.twoWeeks: '월',
-          CalendarFormat.week: '2주',
-        },
-        daysOfWeekStyle: DaysOfWeekStyle(weekendStyle: TextStyle(color: Colors.red)),
-        weekendDays: [7],
-        calendarStyle: CalendarStyle(
-          weekendTextStyle: TextStyle(color: Colors.red),
-          todayDecoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            shape: BoxShape.circle,
-          ),
-          selectedDecoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.5),
-            shape: BoxShape.circle,
-          ),
-        ),
-        focusedDay: _focusedDay,
-      )
-    );
-  }
-
-  Widget _assetRow() {
-    return Container(
-
     );
   }
 
@@ -102,14 +109,9 @@ class _CalendarPageState extends State<CalendarPage> {
     return TabBarView(
         children: [
           DailyCalendarPage(),
-          _calendar()
+          MonthCalendarPage()
         ]
     );
-    // return Column(
-    //   children: [
-    //     _calendar(),
-    //   ],
-    // );
   }
 
   @override
@@ -119,6 +121,10 @@ class _CalendarPageState extends State<CalendarPage> {
       child: Scaffold(
         appBar: _appbar(),
         body: _body(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => Get.to(() => NewCostPage()),
+          child: Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }

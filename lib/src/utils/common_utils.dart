@@ -56,6 +56,10 @@ class CommonUtils {
     return '${formatCurrency.format(price)} 원';
   }
 
+  String priceFormatOnlyNum(int price) {
+    return '${formatCurrency.format(price)}';
+  }
+
   String setComma(int amount) {
     return formatCurrency.format(amount);
   }

@@ -1,0 +1,17 @@
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('1', '월급', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('2', '부수입', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('3', '용돈', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('4', '상여', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('5', '금융소득', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('6', '기타', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('7', '식비', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('8', '교통/차량', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('9', '문화생활', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('10', '마트/편의점', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('11', '취미생활', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('12', '생활용품', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('13', '주거/통신', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('14', '건강', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('15', '교육', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('16', '패션/미용', '2');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('17', '기타', '2');
