@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget datePicker() {
-    DateTime now = _utilController.date;
+    // DateTime now = _utilController.date;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 50, vertical: 5),
       decoration: BoxDecoration(

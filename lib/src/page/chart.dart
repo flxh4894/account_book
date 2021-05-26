@@ -1,16 +1,13 @@
-import 'package:accountbook/src/component/datePicker.dart';
 import 'package:accountbook/src/component/list_row.dart';
 import 'package:accountbook/src/controller/chart_controller.dart';
-import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/model/category_info.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:math' as math;
 
 class ChartPage extends StatelessWidget {
-  final UtilController _utilController = Get.find<UtilController>();
+  // final UtilController _utilController = Get.find<UtilController>();
   final ChartController _chartController = Get.put(ChartController());
   final CommonUtils _utils = CommonUtils();
 

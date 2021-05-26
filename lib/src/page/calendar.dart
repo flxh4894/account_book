@@ -7,7 +7,6 @@ import 'package:accountbook/src/page/new_cost.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -18,9 +17,6 @@ class _CalendarPageState extends State<CalendarPage> {
   final UtilController _utilController = Get.find<UtilController>();
   final CostController _costController = Get.put(CostController());
   final CommonUtils _utils = CommonUtils();
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay = DateTime.now();
 
   Widget _appbar() {
     return AppBar(

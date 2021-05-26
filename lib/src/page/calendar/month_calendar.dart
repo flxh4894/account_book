@@ -18,8 +18,8 @@ class _MonthCalendarPageState extends State<MonthCalendarPage> {
   final CostController _costController = Get.find<CostController>();
   final UtilController _utilController = Get.find<UtilController>();
   final CommonUtils _utils = CommonUtils();
-  DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay = DateTime.now();
+  // DateTime _focusedDay = DateTime.now();
+  // DateTime _selectedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
