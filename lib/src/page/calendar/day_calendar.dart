@@ -88,7 +88,7 @@ class DailyCalendarPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(content.title, overflow: TextOverflow.ellipsis),
-                Text('${content.date.substring(8,10)}:${content.date.substring(10,12)} 삼성카드',
+                Text('${content.date.substring(8,10)}:${content.date.substring(10,12)} ${content.assetNm}',
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.5), fontSize: 12)
                 ),

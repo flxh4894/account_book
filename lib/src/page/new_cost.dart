@@ -1,5 +1,6 @@
 
 import 'package:accountbook/src/component/calculator.dart';
+import 'package:accountbook/src/component/dialog/asset_dialog.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/model/asset_content.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
@@ -27,11 +28,11 @@ class _NewCostPageState extends State<NewCostPage> {
   int categoryId = -1;
   String category = '카테고리 선택';
 
-  int assetId = -1;
+  int assetId = 3; // 기본 현금
   String asset = '자산 선택';
   
   String price = '0';
-  int type = 2;
+  int assetType = 2; // 자산 형태 선택 ( 소비 or 지출 )
 
   @override
   void initState() {
@@ -40,6 +41,13 @@ class _NewCostPageState extends State<NewCostPage> {
     textDate.text =
         '${_utils.getDate(DateTime.now())} (${_utils.getDay(DateTime.now())})';
     super.initState();
+  }
+
+  void getAssetInfo(String asset, int assetId) {
+    setState(() {
+      this.asset = asset;
+      this.assetId = assetId;
+    });
   }
 
   Widget _appbar() {
@@ -87,7 +95,7 @@ class _NewCostPageState extends State<NewCostPage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          type = _type;
+          assetType = _type;
           title = _title;
         });
       },
@@ -98,12 +106,12 @@ class _NewCostPageState extends State<NewCostPage> {
             color: Colors.white,
             border: Border.all(
                 width: 1,
-                color: _type == type ? color : Colors.black.withOpacity(0.5)),
+                color: _type == assetType ? color : Colors.black.withOpacity(0.5)),
             borderRadius: BorderRadius.circular(5)),
         child: Center(
             child: Text(_title,
                 style: TextStyle(
-                    color: _type == type
+                    color: _type == assetType
                         ? color
                         : Colors.black.withOpacity(0.5)))),
       ),
@@ -221,7 +229,7 @@ class _NewCostPageState extends State<NewCostPage> {
       onTap: () => showDialog(
           context: context,
           builder: (context) {
-            return _assetsDialog();
+            return AssetDialog(callback: getAssetInfo,);
           }
       ),
       child: Container(
@@ -335,11 +343,10 @@ class _NewCostPageState extends State<NewCostPage> {
           AssetContent assetContent = AssetContent(
               title: textTitle.text,
               price: int.parse(price),
-              assetType: type,
+              assetId: assetId,
+              assetType: assetType,
               date: date + time,
-              category: categoryId,
-              memo: '우주미남도원의 가계부',
-              bank: 2);
+              category: categoryId,);
           _costController.insertCostContent(assetContent);
         },
         child: Text(
@@ -403,74 +410,6 @@ class _NewCostPageState extends State<NewCostPage> {
                     },
                   ),
                 )
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  TextButton(onPressed: () => Get.back(), child: Text('취소')),
-                  // TextButton(onPressed: () {}, child: Text('추가')),
-                ],
-              )
-            ],
-          ),
-        ));
-  }
-
-  Widget _assetsDialog() {
-    return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 1,
-        backgroundColor: Colors.white,
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  color: Theme.of(context).primaryColor,
-                ),
-                child: Center(
-                    child: Text('자산',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)
-                    )
-                ),
-              ),
-              Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(top: 5),
-                    child: ListView.separated(
-                      itemCount: _costController.categoryList.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              categoryId = _costController.categoryList[index].id;
-                              category = _costController.categoryList[index].name;
-                            });
-                            Get.back();
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                            child: Text('${_costController.categoryList[index].name} $categoryId'),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, _) {
-                        return Divider();
-                      },
-                    ),
-                  )
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -37,7 +37,7 @@ class CostController extends GetxController {
     return _database;
   }
 
-  // 월별 소비 내역 가져오기
+  // 월별 가계부 가져오기
   Future<bool> getMonthCostContent(DateTime date) async {
     final db = await database;
     final year = date.year;
@@ -45,8 +45,8 @@ class CostController extends GetxController {
     final yearMonth = '$year$month';
 
     var list = await db.rawQuery(
-        "SELECT A.id, A.title, A.asset_type, A.price, A.date, B.name AS category, B.type AS type " +
-            "FROM daily_cost A, category B WHERE A.category = B.id " +
+        "SELECT A.id, A.title, A.price, A.date, B.name AS category, B.type AS type, C.name AS asset_nm " +
+            "FROM daily_cost A, category B, assets C WHERE A.category = B.id AND A.asset_id = C.id " +
             "AND A.date BETWEEN '${yearMonth}01' AND '${yearMonth}31'  ORDER BY date desc");
 
     dailyCostList.clear();
@@ -77,7 +77,7 @@ class CostController extends GetxController {
     return true;
   }
 
-  // 새로운 소비 내역 저장하기
+  // 새로운 가계부 저장하기
   void insertCostContent(AssetContent assetContent) async {
     final db = await database;
 
@@ -87,7 +87,7 @@ class CostController extends GetxController {
     Get.back();
   }
 
-  // 자산 내역 출력하기
+  // 현재 자산 내역 출력하기
   void setAssetList() {
     monthTotal( monthTotalPlus.value - monthTotalMinus.value );
     List<Map<String, dynamic>> data = [];

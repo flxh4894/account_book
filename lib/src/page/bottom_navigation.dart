@@ -3,6 +3,8 @@ import 'package:accountbook/src/page/goal.dart';
 import 'package:accountbook/src/page/home.dart';
 import 'package:flutter/material.dart';
 
+import 'card_performance.dart';
+
 class BottomNavigationPage extends StatefulWidget {
   @override
   _BottomNavigationPageState createState() => _BottomNavigationPageState();
@@ -10,7 +12,7 @@ class BottomNavigationPage extends StatefulWidget {
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
   int _currentIndex = 0;
-  final List<Widget> _children = [HomePage(), GoalPage(), CalendarPage()];
+  final List<Widget> _children = [HomePage(), GoalPage(), CardPerformancePage(), CalendarPage()];
 
   void _onTap(int index) {
     setState(() {
@@ -45,6 +47,10 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
           new BottomNavigationBarItem(
             icon: Icon(Icons.format_list_bulleted),
             label: '모아보기',
+          ),
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.credit_card),
+            label: '카드실적',
           ),
           new BottomNavigationBarItem(
             backgroundColor: Colors.white,

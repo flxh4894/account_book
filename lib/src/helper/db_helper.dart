@@ -26,14 +26,40 @@ class DatabaseHelper {
       );
       await initCategory(db);
 
+      db.execute('''
+        CREATE TABLE "assets" (
+          "id"	INTEGER,
+          "name"	TEXT NOT NULL,
+          "memo"	TEXT NOT NULL,
+          "type"	INTEGER NOT NULL DEFAULT 1,
+          "is_favorite"	INTEGER NOT NULL DEFAULT 0,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        )'''
+      );
+
+      db.execute('''
+        CREATE TABLE "credit_card" (
+          "id"	INTEGER,
+          "asset_id"	INTEGER NOT NULL,
+          "card_nm"	TEXT NOT NULL,
+          "tag"	TEXT NOT NULL,
+          "performance"	INTEGER NOT NULL,
+          "pay_date"	INTEGER NOT NULL,
+          PRIMARY KEY("id" AUTOINCREMENT),
+          FOREIGN KEY("asset_id") REFERENCES "assets"("id")
+        )'''
+      );
+
       return db.execute('''
-        CREATE TABLE daily_cost (
+        CREATE TABLE "daily_cost" (
           "id"	INTEGER,
           "category"	INTEGER NOT NULL,
-          "title"	TEXT NOT NULL,
-          "asset_type"	INTEGER NOT NULL,
+          "title"	BLOB NOT NULL,
+          "asset_id"	INTEGER NOT NULL,
+          "asset_type"	INTEGER NOT NULL DEFAULT 1,
           "price"	INTEGER NOT NULL,
-          "date"	TEXT,
+          "date"	TEXT NOT NULL,
+          FOREIGN KEY("asset_id") REFERENCES "assets"("id"),
           PRIMARY KEY("id" AUTOINCREMENT)
         )'''
       );
