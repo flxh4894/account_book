@@ -19,7 +19,6 @@ class CardController extends GetxController {
   @override
   void onInit() {
     getCreditCardList();
-    getAddableCardList();
     super.onInit();
   }
 
@@ -47,7 +46,7 @@ class CardController extends GetxController {
     var list = await db.rawQuery(""
         "SELECT A.id, A.name, A.memo "
         "FROM assets A LEFT JOIN credit_card B ON B.asset_id = A.id "
-        "WHERE B.asset_id IS NULL AND A.type = 2");
+        "WHERE B.asset_id IS NULL AND A.type = 3");
 
     addableCardList( list.map((e) => AssetInfo.fromJson(e)).toList() );
     list.forEach((element) {

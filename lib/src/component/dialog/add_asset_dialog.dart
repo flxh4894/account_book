@@ -14,7 +14,7 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
 
   final TextEditingController _textName = TextEditingController();
   final TextEditingController _textTag = TextEditingController();
-  final _assetTypeList = ['현금', '은행(통장)', '신용(체크)카드', '기타'];
+  final _assetTypeList = ['현금', '은행(통장)', '신용(체크)카드', '투자', '기타'];
   String _assetType = '현금'; // 기본값 : 현금
   int _isFavorite = 0; // 즐겨찾기 설정 기본값 : false
 

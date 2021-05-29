@@ -31,7 +31,6 @@ class CreditCard {
     'asset_id': assetId,
     'card_nm': cardNm,
     'tag': tag,
-    'price': price,
     'performance': performance,
     'pay_date': payDate
   };

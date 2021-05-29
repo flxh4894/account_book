@@ -1,6 +1,7 @@
 import 'package:accountbook/src/page/calendar.dart';
 import 'package:accountbook/src/page/goal.dart';
 import 'package:accountbook/src/page/home.dart';
+import 'package:accountbook/src/page/mypage.dart';
 import 'package:flutter/material.dart';
 
 import 'card_performance.dart';
@@ -12,7 +13,13 @@ class BottomNavigationPage extends StatefulWidget {
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
   int _currentIndex = 0;
-  final List<Widget> _children = [HomePage(), GoalPage(), CardPerformancePage(), CalendarPage()];
+  final List<Widget> _children = [
+    HomePage(),
+    CalendarPage(),
+    GoalPage(),
+    CardPerformancePage(),
+    MyPage()
+  ];
 
   void _onTap(int index) {
     setState(() {
@@ -45,8 +52,13 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             label: '홈',
           ),
           new BottomNavigationBarItem(
-            icon: Icon(Icons.format_list_bulleted),
-            label: '모아보기',
+            backgroundColor: Colors.white,
+            icon: Icon(Icons.calendar_today),
+            label: '가계부',
+          ),
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard_outlined),
+            label: '내 목표',
           ),
           new BottomNavigationBarItem(
             icon: Icon(Icons.credit_card),
@@ -54,8 +66,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
           ),
           new BottomNavigationBarItem(
             backgroundColor: Colors.white,
-            icon: Icon(Icons.calendar_today),
-            label: '메모',
+            icon: Icon(Icons.account_circle_outlined),
+            label: '마이페이지',
           )
         ],
       ),

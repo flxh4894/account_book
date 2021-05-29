@@ -12,13 +12,12 @@ class CardPerformancePage extends StatefulWidget {
 
 class _CardPerformancePageState extends State<CardPerformancePage> {
   final CommonUtils _utils = CommonUtils();
-  final CardController _cardController = Get.put(CardController());
-
+  final CardController _cardController = Get.find<CardController>();
 
   @override
-  void dispose() {
-    Get.delete<CardController>();
-    super.dispose();
+  void initState() {
+    _cardController.getCreditCardList();
+    super.initState();
   }
 
   Widget _appbar() {
@@ -28,12 +27,15 @@ class _CardPerformancePageState extends State<CardPerformancePage> {
       backgroundColor: Colors.white,
       actions: [
         GestureDetector(
-          onTap: () => showDialog(
-            context: context,
-            builder: (context) {
-              return AddCardDialog();
-            }
-          ),
+          onTap: () {
+            _cardController.getAddableCardList();
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AddCardDialog();
+                }
+            );
+          },
           child: Row(
             children: [
               Image.asset(
@@ -177,9 +179,17 @@ class _CardPerformancePageState extends State<CardPerformancePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('등록된 카드가 없습니다.'),
+        Text('등록된 카드 또는 거래내역이 없습니다.'),
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            _cardController.getAddableCardList();
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AddCardDialog();
+                }
+            );
+          },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,

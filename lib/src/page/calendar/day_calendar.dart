@@ -42,10 +42,10 @@ class DailyCalendarPage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${_utils.getYearMonth(now)}',
-                    style: TextStyle(
-                        fontSize: 14, color: Colors.black.withOpacity(0.5))
-                ),
+                // Text('${_utils.getYearMonth(now)}',
+                //     style: TextStyle(
+                //         fontSize: 14, color: Colors.black.withOpacity(0.5))
+                // ),
                 Container(
                   decoration: BoxDecoration(
                       color: color ,

@@ -3,7 +3,7 @@ INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('2', '�
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('3', '용돈', '1');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('4', '상여', '1');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('5', '금융소득', '1');
-INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('6', '기타', '1');
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('6', '투자', '3');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('7', '식비', '2');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('8', '교통/차량', '2');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('9', '문화생활', '2');

@@ -28,7 +28,7 @@ class _NewCostPageState extends State<NewCostPage> {
   int categoryId = -1;
   String category = '카테고리 선택';
 
-  int assetId = 3; // 기본 현금
+  int assetId = -1; // 기본 현금
   String asset = '자산 선택';
   
   String price = '0';
@@ -100,7 +100,7 @@ class _NewCostPageState extends State<NewCostPage> {
         });
       },
       child: Container(
-        width: size.width / 2 * 0.8,
+        width: size.width / 2 * 0.55,
         padding: EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
             color: Colors.white,
@@ -124,6 +124,7 @@ class _NewCostPageState extends State<NewCostPage> {
       children: [
         _iconButton('소득', 1, Colors.red),
         _iconButton('지출', 2, Colors.blue),
+        _iconButton('투자', 3, Colors.green),
       ],
     );
   }
@@ -339,6 +340,54 @@ class _NewCostPageState extends State<NewCostPage> {
           var hour = picked.hour < 10 ? '0${picked.hour}' : picked.hour;
           var min = picked.minute < 10 ? '0${picked.minute}' : picked.minute;
           var time = '$hour$min';
+
+          if(assetId == -1){
+            Get.defaultDialog(
+              barrierDismissible: true,
+              title: '',
+              textCancel: '확인',
+              content: Center(
+                child: Text('자산을 선택해 주세요.'),
+              )
+            );
+            return;
+          }
+
+          if(categoryId == -1){
+            Get.defaultDialog(
+                barrierDismissible: true,
+                title: '',
+                textCancel: '확인',
+                content: Center(
+                  child: Text('카테고리를 선택해 주세요.'),
+                )
+            );
+            return;
+          }
+
+          if(price.isEmpty || price == '0'){
+            Get.defaultDialog(
+                barrierDismissible: true,
+                title: '',
+                textCancel: '확인',
+                content: Center(
+                  child: Text('금액을 입력해 주세요.'),
+                )
+            );
+            return;
+          }
+
+          if(textTitle.text.isEmpty){
+            Get.defaultDialog(
+                barrierDismissible: true,
+                title: '',
+                textCancel: '확인',
+                content: Center(
+                  child: Text('메모를 입력해 주세요.'),
+                )
+            );
+            return;
+          }
 
           AssetContent assetContent = AssetContent(
               title: textTitle.text,

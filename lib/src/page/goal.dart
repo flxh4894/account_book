@@ -1,6 +1,9 @@
+import 'package:accountbook/src/controller/goal_controller.dart';
+import 'package:accountbook/src/model/invest_info.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class GoalPage extends StatefulWidget {
 
@@ -9,8 +12,15 @@ class GoalPage extends StatefulWidget {
 }
 
 class _GoalPageState extends State<GoalPage> {
-
+  final GoalController _goalController = Get.put(GoalController());
   final CommonUtils _utils = CommonUtils();
+
+
+  @override
+  void initState() {
+    _goalController.init();
+    super.initState();
+  }
 
   Widget _body() {
     return SingleChildScrollView(
@@ -44,49 +54,39 @@ class _GoalPageState extends State<GoalPage> {
   }
 
   Widget _barChart() {
-    return Container(
-      height: 300,
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
-      child: BarChart(
-          BarChartData(
-            titlesData: FlTitlesData(
-              show: true,
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTextStyles: (value) =>
-                const TextStyle(color: Colors.black,fontSize: 14),
-                margin: 16,
-                getTitles: (double value) {
-                  switch (value.toInt()) {
-                    case 0:
-                      return '1월';
-                    case 1:
-                      return '2월';
-                    case 2:
-                      return '3월';
-                    case 3:
-                      return '4월';
-                    case 4:
-                      return '5월';
-                    case 5:
-                      return '6월';
-                    case 6:
-                      return '7월';
-                    default:
-                      return '';
-                  }
-                },
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        width: 500,
+        height: 300,
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+        child: BarChart(
+            BarChartData(
+              titlesData: FlTitlesData(
+                show: true,
+                bottomTitles: SideTitles(
+                  showTitles: true,
+                  getTextStyles: (value) =>
+                  const TextStyle(color: Colors.black,fontSize: 14),
+                  margin: 16,
+                  getTitles: (double value) {
+                    switch (value.toInt()) {
+                      default:
+                        return '${value.toInt()+1}월';
+                    }
+                  },
+                ),
+                leftTitles: SideTitles(
+                  showTitles: false,
+                ),
               ),
-              leftTitles: SideTitles(
-                showTitles: false,
+              borderData: FlBorderData(
+                show: false,
               ),
-            ),
-            borderData: FlBorderData(
-              show: false,
-            ),
-            barGroups: showingGroups(),
-          )
+              barGroups: showingGroups(),
+            )
+        ),
       ),
     );
   }
@@ -110,7 +110,7 @@ class _GoalPageState extends State<GoalPage> {
     );
   }
 
-  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
+  List<BarChartGroupData> showingGroups() => List.generate(12, (i) {
     switch (i) {
       case 0:
         return makeGroupData(0, 5,  false);
@@ -126,6 +126,18 @@ class _GoalPageState extends State<GoalPage> {
         return makeGroupData(5, 0,  false);
       case 6:
         return makeGroupData(6, 0,  false);
+      case 7:
+        return makeGroupData(7, 0,  false);
+      case 8:
+        return makeGroupData(8, 0,  false);
+      case 9:
+        return makeGroupData(9, 5,  false);
+      case 10:
+        return makeGroupData(10, 7,  false);
+      case 11:
+        return makeGroupData(11, 0,  false);
+      case 12:
+        return makeGroupData(12, 0,  false);
       default:
         return throw Error();
     }
@@ -141,13 +153,16 @@ class _GoalPageState extends State<GoalPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('총 저축 금액', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text('8,100,000 원', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),),
-              SizedBox(height: 5),
-              Text('5월 26일 기준', style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.5))),
-            ]
+          Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('${_utils.priceFormat(_goalController.yearTotalAsset.value)}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),),
+                SizedBox(height: 5),
+                Text('${_utils.getDate(DateTime.now())} 기준', style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.5))),
+              ]
+            ),
           ),
         ],
       ),
@@ -181,15 +196,19 @@ class _GoalPageState extends State<GoalPage> {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(left: 16, top: 10, bottom: 10, right: 16),
-      child: Column(
-        children: [
-          SizedBox(height: 20),
-          _assetTile('마이여행파트너적금', '#우리은행 #여행자금', 2500000),
-          _assetTile('펀드', '#키움증권', 200000),
-          _assetTile('주식', '#키움증권', 2800000),
-          _assetTile('비트코인', '#업비트', 100000),
-          _assetTile('보유현금', '#신한은행', 2000000),
-        ],
+      child: Obx(
+        () => Column(
+          children: [
+            SizedBox(height: 20),
+            for(InvestInfo invest in _goalController.yearInvestList)
+              _assetTile(invest.title, '#${invest.tag}', invest.price),
+            // _assetTile('마이여행파트너적금', '#우리은행 #여행자금', 2500000),
+            // _assetTile('펀드', '#키움증권', 200000),
+            // _assetTile('주식', '#키움증권', 2800000),
+            // _assetTile('비트코인', '#업비트', 100000),
+            // _assetTile('보유현금', '#신한은행', 2000000),
+          ],
+        ),
       ),
     );
   }
@@ -221,9 +240,8 @@ class _GoalPageState extends State<GoalPage> {
       backgroundColor: Colors.grey.withOpacity(0.1),
       appBar: AppBar(
         elevation: 0,
-        centerTitle: true,
         backgroundColor: Colors.white,
-        title: Text('내 목표', style: TextStyle(fontSize: 18)),
+        title: Text('내 목표'),
       ),
       body: _body(),
     );

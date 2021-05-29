@@ -1,3 +1,4 @@
+import 'package:accountbook/src/controller/card_controller.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/page/bottom_navigation.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(UtilController());
         Get.put(CostController());
+        Get.put(CardController());
       }),
       home: BottomNavigationPage()
     );
