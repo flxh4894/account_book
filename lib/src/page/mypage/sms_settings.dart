@@ -34,8 +34,11 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
   Future<void> _getNativeValue() async {
     String value;
     try {
-      var a = await platform.invokeMethod('getValue');
-      value = a.toString();
+      List a = await platform.invokeMethod('getValue');
+      a.forEach((element) {
+        print(element);
+      });
+      value = a[0]['text'];
     } on PlatformException catch (e) {
       value = '네이티브 에러 : ${e.message}';
     }
