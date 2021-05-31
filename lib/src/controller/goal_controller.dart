@@ -1,5 +1,6 @@
 import 'package:accountbook/src/helper/db_helper.dart';
 import 'package:accountbook/src/model/invest_info.dart';
+import 'package:accountbook/src/model/year_goal.dart';
 import 'package:get/get.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,9 +12,10 @@ class GoalController extends GetxController {
     return _database;
   }
 
-  RxList<int> monthAssetList = <int>[].obs;
-  RxInt yearTotalAsset = 0.obs;
-  RxList<InvestInfo> yearInvestList = <InvestInfo>[].obs;
+  RxList<int> monthAssetList = <int>[].obs; // 월별 저축금액 리스트
+  RxInt yearTotalAsset = 0.obs; // 1년간 총 모은 금액
+  RxList<InvestInfo> yearInvestList = <InvestInfo>[].obs; // 1년간 저축한 리스트
+  Rx<YearGoal> goal = new YearGoal().obs;
 
   @override
   void onInit() {
@@ -23,6 +25,7 @@ class GoalController extends GetxController {
   void init(){
     monthAssetList.clear();
     yearTotalAsset(0);
+    selectYearGoal();
     yearInvestList.clear();
 
     getMonthTotalAsset();
@@ -106,24 +109,50 @@ class GoalController extends GetxController {
     var invest = await getMonthInvest(db);
 
     for(int i=0; i<12; i++) {
-      monthAssetList.add(income[i] - expense[i] - invest[i]);
+      monthAssetList.add(income[i] - expense[i] );
     }
 
     var totalCash = 0;
+    var index = 0;
     monthAssetList.forEach((element) {
-      totalCash += element;
+      totalCash += element - invest[index];
+      index ++ ;
     });
 
-    yearInvestList.add(
-        new InvestInfo(
-            assetId: -1,
-            price: totalCash,
-            title: '현금',
-            tag: '보유현금 \n#사용에 따라 마이너스 표기 가능')
-    );
+    // 작년 금액으로 투자를 한 경우
+    if(totalCash < 0)  {
+      yearInvestList.add(
+          new InvestInfo(
+              assetId: -1,
+              price: 0,
+              title: '현금',
+              tag: '보유현금 \n#사용에 따라 마이너스 표기 가능')
+      );
+      yearInvestList.add(
+          new InvestInfo(
+              assetId: -1,
+              price: totalCash,
+              title: '작년 저축 금액',
+              tag: '투자에 사용한 작년까지의 저축 금액')
+      );
+    } else {
+      yearInvestList.add(
+          new InvestInfo(
+              assetId: -1,
+              price: totalCash,
+              title: '현금',
+              tag: '보유현금 \n#사용에 따라 마이너스 표기 가능')
+      );
+    }
     yearTotalAsset(yearTotalAsset.value + totalCash);
+  }
 
-    print(monthAssetList.toString());
+  void selectYearGoal() async {
+    final db = await database;
+    var year = DateTime.now().year.toString();
+    var list = await db.query("year_goal", where: "year = ?", whereArgs: [year], limit: 1);
+
+    goal( new YearGoal.fromJson(list[0])  );
   }
 
 }

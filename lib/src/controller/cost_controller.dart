@@ -18,6 +18,7 @@ class CostController extends GetxController {
   RxList<Category> categoryList = <Category>[].obs;
   RxInt monthTotalPlus = 0.obs;
   RxInt monthTotalMinus = 0.obs;
+  RxInt monthTotalInvest = 0.obs;
   RxInt monthTotal = 0.obs;
 
   @override
@@ -45,13 +46,29 @@ class CostController extends GetxController {
     final yearMonth = '$year$month';
 
     var list = await db.rawQuery(
-        "SELECT A.id, A.title, A.price, A.date, B.name AS category, B.type AS type, C.name AS asset_nm " +
-            "FROM daily_cost A, category B, assets C WHERE A.category = B.id AND A.asset_id = C.id " +
-            "AND A.date BETWEEN '${yearMonth}01' AND '${yearMonth}31'  ORDER BY date desc");
+        "SELECT "
+            "A.id, "
+            "A.title, "
+            "A.price, "
+            "A.date, "
+            "B.id AS category_id, "
+            "B.name AS category, "
+            "B.type AS type, "
+            "C.id AS asset_id, "
+            "C.name AS asset_nm " +
+        "FROM "
+            "daily_cost A, category B, assets C "
+        "WHERE "
+            "A.category = B.id "
+            "AND A.asset_id = C.id " +
+            "AND A.date BETWEEN '${yearMonth}01' "
+            "AND '${yearMonth}31'  "
+        "ORDER BY date desc");
 
     dailyCostList.clear();
     int plus = 0;
     int minus = 0;
+    int invest = 0;
 
     costContentList(list.map((e) => DailyCost.fromJson(e)).toList());
     // 당일 내역 일별 복사
@@ -67,11 +84,15 @@ class CostController extends GetxController {
 
       if (DailyCost.fromJson(element).type == 1)
         plus += DailyCost.fromJson(element).price;
-      else
+      else if (DailyCost.fromJson(element).type == 2)
         minus += DailyCost.fromJson(element).price;
+      else
+        invest += DailyCost.fromJson(element).price;
+
     });
     monthTotalPlus(plus);
     monthTotalMinus(minus);
+    monthTotalInvest(invest);
 
     setAssetList();
     return true;
@@ -116,6 +137,32 @@ class CostController extends GetxController {
 
     var list = await db.query("category");
     categoryList(list.map((e) => Category.fromJson(e)).toList());
+  }
+
+  // 가계부 삭제
+  void removeCostContent(List<int> selectedList) async {
+    final db = await database;
+    Batch batch = db.batch();
+
+    for(var id in selectedList)
+      batch.rawDelete("DELETE FROM daily_cost WHERE id = $id");
+
+    await batch.commit();
+    await getMonthCostContent(_utilController.date);
+    Get.back();
+  }
+
+  // 가계부 업데이트(수정)
+  void updateCostContent(DailyCost dailyCost) async {
+    final db = await database;
+
+    await db.update("daily_cost",
+        dailyCost.toMap(),
+        where: "id = ?",
+        whereArgs: [dailyCost.id]);
+
+    await getMonthCostContent(_utilController.date);
+    Get.back();
   }
 
 

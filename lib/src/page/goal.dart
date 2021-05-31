@@ -61,31 +61,46 @@ class _GoalPageState extends State<GoalPage> {
         height: 300,
         color: Colors.white,
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
-        child: BarChart(
-            BarChartData(
-              titlesData: FlTitlesData(
-                show: true,
-                bottomTitles: SideTitles(
-                  showTitles: true,
-                  getTextStyles: (value) =>
-                  const TextStyle(color: Colors.black,fontSize: 14),
-                  margin: 16,
-                  getTitles: (double value) {
-                    switch (value.toInt()) {
-                      default:
-                        return '${value.toInt()+1}월';
+        child: Obx(
+          () => BarChart(
+              BarChartData(
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: SideTitles(
+                    showTitles: true,
+                    getTextStyles: (value) =>
+                    const TextStyle(color: Colors.black,fontSize: 14),
+                    margin: 16,
+                    getTitles: (double value) {
+                      switch (value.toInt()) {
+                        default:
+                          return '${value.toInt()+1}월';
+                      }
+                    },
+                  ),
+                  leftTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                ),
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                          '${groupIndex+1}월 \n ${_utils.priceFormat(rod.y.toInt())}',
+                          TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold
+                          )
+                      );
                     }
-                  },
+                  )
                 ),
-                leftTitles: SideTitles(
-                  showTitles: false,
+                borderData: FlBorderData(
+                  show: false,
                 ),
-              ),
-              borderData: FlBorderData(
-                show: false,
-              ),
-              barGroups: showingGroups(),
-            )
+                barGroups: showingGroups(),
+              )
+          ),
         ),
       ),
     );
@@ -101,7 +116,7 @@ class _GoalPageState extends State<GoalPage> {
           width: 22,
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
-            y: 15,
+            y: 10000000,
             colors: [Colors.grey.withOpacity(0.2)]
           )
         ),
@@ -110,38 +125,17 @@ class _GoalPageState extends State<GoalPage> {
     );
   }
 
-  List<BarChartGroupData> showingGroups() => List.generate(12, (i) {
-    switch (i) {
-      case 0:
-        return makeGroupData(0, 5,  false);
-      case 1:
-        return makeGroupData(1, 6.5,  false);
-      case 2:
-        return makeGroupData(2, 5,  false);
-      case 3:
-        return makeGroupData(3, 7.5,  false);
-      case 4:
-        return makeGroupData(4, 9,  true);
-      case 5:
-        return makeGroupData(5, 0,  false);
-      case 6:
-        return makeGroupData(6, 0,  false);
-      case 7:
-        return makeGroupData(7, 0,  false);
-      case 8:
-        return makeGroupData(8, 0,  false);
-      case 9:
-        return makeGroupData(9, 5,  false);
-      case 10:
-        return makeGroupData(10, 7,  false);
-      case 11:
-        return makeGroupData(11, 0,  false);
-      case 12:
-        return makeGroupData(12, 0,  false);
-      default:
-        return throw Error();
+  List<BarChartGroupData> showingGroups() {
+
+    List<BarChartGroupData> list = <BarChartGroupData>[];
+    int month = 0;
+    for(var data in _goalController.monthAssetList){
+      list.add(makeGroupData(month, data.toDouble(),  false));
+      month ++;
     }
-  });
+
+    return list;
+  }
 
   Widget _currentSaveAssets() {
     return Container(

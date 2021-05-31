@@ -50,6 +50,15 @@ class DatabaseHelper {
         )'''
       );
 
+      db.execute('''
+        CREATE TABLE "year_goal" (
+          "id"	INTEGER,
+          "year"	INTEGER NOT NULL,
+          "price"	INTEGER NOT NULL,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        )'''
+      );
+
       return db.execute('''
         CREATE TABLE "daily_cost" (
           "id"	INTEGER,

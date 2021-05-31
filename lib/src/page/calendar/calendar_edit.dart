@@ -1,19 +1,99 @@
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/model/daily_cost.dart';
-import 'package:accountbook/src/page/calendar/calendar_edit.dart';
-import 'package:accountbook/src/page/edit_cost.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DailyCalendarPage extends StatefulWidget {
+class CalendarEditPage extends StatefulWidget {
   @override
-  _DailyCalendarPageState createState() => _DailyCalendarPageState();
+  _CalendarEditPageState createState() => _CalendarEditPageState();
 }
 
-class _DailyCalendarPageState extends State<DailyCalendarPage> {
+class _CalendarEditPageState extends State<CalendarEditPage> {
   final CostController _costController = Get.find<CostController>();
   final CommonUtils _utils = CommonUtils();
+  bool selectMode = true;
+  List<int> selectedList = <int>[];
+  int total = 0;
+
+
+  @override
+  void initState() {
+    selectedList.add(Get.arguments['id']);
+    var type = 1;
+    if(Get.arguments['type'] == 2){
+      type = -1;
+    }
+    total += Get.arguments['price'] * type;
+    super.initState();
+  }
+
+  Widget _appbar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: Colors.white,
+      title: Text('수정'),
+      actions: [
+        IconButton(
+            icon: Icon(Icons.delete_outlined),
+            onPressed: () {
+              _costController.removeCostContent(selectedList);
+            }
+        ),
+        IconButton(
+            icon: Icon(Icons.more_horiz),
+            onPressed: () {}
+        )
+      ],
+    );
+  }
+  
+  Widget _body() {
+    return Obx(
+          () => Container(
+        child: Column(
+          children: [
+            _selectedInfo(),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: _costController.dailyCostList.length,
+                  itemBuilder: (context, index) {
+                    List<String> keys = _costController.dailyCostList.keys.toList();
+
+                    if(index != _costController.dailyCostList.length - 1)
+                      return _dayListTile(keys[index], _costController.dailyCostList[keys[index]]);
+                    else
+                      return Container(
+                          margin: EdgeInsets.only(bottom: 50),
+                          child: _dayListTile(keys[index], _costController.dailyCostList[keys[index]])
+                      );
+                  }
+              ),
+            ),
+          ]
+        ),
+      ),
+    );
+  }
+
+  Widget _selectedInfo() {
+    return Container(
+      color: Theme.of(context).primaryColor,
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('${selectedList.length}건이 선택되었습니다.', style: TextStyle(color: Colors.white)),
+          Text('${_utils.priceFormat(total)}',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold
+              )
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _dayListTile(String day, List<DailyCost> list) {
     var totalMinus = 0;
@@ -22,7 +102,7 @@ class _DailyCalendarPageState extends State<DailyCalendarPage> {
     for(var content in list){
       if(content.type == 1) {
         totalPlus += content.price;
-      } else if(content.type == 2) {
+      } else {
         totalMinus += content.price;
       }
     }
@@ -77,29 +157,30 @@ class _DailyCalendarPageState extends State<DailyCalendarPage> {
   }
 
   Widget contentDetail(DailyCost content) {
-    var color = Colors.red;
-    if(content.type == 2)
-      color = Colors.blue;
-    else if(content.type == 3)
-      color = Colors.green;
-
     return Material(
-      color: Colors.transparent,
+      color: selectedList.contains(content.id) ?
+      Theme.of(context).primaryColor.withOpacity(0.5) : Colors.transparent,
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: Theme.of(context).primaryColor.withOpacity(0.2),
         onTap: () {
-          Get.to(() => EditCostPage(), arguments: content);
-        },
-        onLongPress: () {
-          Get.to(() => CalendarEditPage(),
-            duration: Duration(seconds: 0),
-            arguments: {
-              'id': content.id,
-              'price': content.price,
-              'type': content.type
-            },
-            transition: Transition.noTransition);
+          setState(() {
+            var type = 1;
+            if(content.type == 2)
+              type = -1;
+
+            if(selectedList.contains(content.id)){
+              selectedList.remove(content.id);
+              total -= content.price * type;
+            }
+            else {
+              selectedList.add(content.id);
+              total += content.price * type;
+            }
+
+            if(selectedList.length == 0)
+              Get.back();
+          });
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 5),
@@ -125,11 +206,7 @@ class _DailyCalendarPageState extends State<DailyCalendarPage> {
                   ],
                 ),
               ),
-              Text('${_utils.priceFormat(content.price)}',
-                  style: TextStyle(
-                    color: color
-                  )
-              )
+              Text('${_utils.priceFormat(content.price)}', style: TextStyle(color: content.type == 1 ? Colors.red : Colors.blue))
             ],
           ),
         ),
@@ -139,25 +216,9 @@ class _DailyCalendarPageState extends State<DailyCalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => Container(
-        child: _costController.dailyCostList.length == 0 ?
-        Center(child: Text('데이터가 없습니다.'),) :
-        ListView.builder(
-          itemCount: _costController.dailyCostList.length,
-          itemBuilder: (context, index) {
-            List<String> keys = _costController.dailyCostList.keys.toList();
-
-            if(index != _costController.dailyCostList.length - 1)
-              return _dayListTile(keys[index], _costController.dailyCostList[keys[index]]);
-            else
-              return Container(
-                margin: EdgeInsets.only(bottom: 50),
-                child: _dayListTile(keys[index], _costController.dailyCostList[keys[index]])
-              );
-          }
-        ),
-      ),
+    return Scaffold(
+      appBar: _appbar(),
+      body: _body(),
     );
   }
 }
