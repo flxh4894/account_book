@@ -1,4 +1,5 @@
-import 'package:accountbook/src/page/my_assets.dart';
+import 'package:accountbook/src/page/mypage/my_assets.dart';
+import 'package:accountbook/src/page/mypage/sms_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +18,7 @@ class MyPage extends StatelessWidget {
     return Column(
       children: [
         _rowTile('나의 자산', Icons.assessment_outlined, MyAssetsPage()),
-        _rowTile('자산', Icons.assessment_outlined, null),
+        _rowTile('자산', Icons.assessment_outlined, SmsSettingsPage()),
         _rowTile('설정', Icons.settings_outlined, null),
       ],
     );

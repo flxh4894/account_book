@@ -1,7 +1,7 @@
 import 'package:accountbook/src/page/calendar.dart';
 import 'package:accountbook/src/page/goal.dart';
 import 'package:accountbook/src/page/home.dart';
-import 'package:accountbook/src/page/mypage.dart';
+import 'package:accountbook/src/page/mypage/mypage.dart';
 import 'package:flutter/material.dart';
 
 import 'card_performance.dart';
