@@ -1,8 +1,11 @@
+import 'package:accountbook/src/controller/sms_controller.dart';
 import 'package:accountbook/src/page/calendar.dart';
 import 'package:accountbook/src/page/goal.dart';
 import 'package:accountbook/src/page/home.dart';
 import 'package:accountbook/src/page/mypage/mypage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sms/sms.dart';
 
 import 'card_performance.dart';
 
@@ -20,11 +23,20 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     CardPerformancePage(),
     MyPage()
   ];
+  final SmsReceiver receiver = new SmsReceiver();
+  final SmsController smsController = Get.put(SmsController());
+
 
   void _onTap(int index) {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    receiver.onSmsReceived.listen((SmsMessage msg) => smsController.receiveSms(msg));
   }
 
   @override

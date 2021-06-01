@@ -83,7 +83,24 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
                 },
                     child: Text('가져오기'))
               ],
-            )
+            ),
+            Row(
+              children: [
+                Text('SMS 자동 수신'),
+                TextButton(onPressed: (){
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) {
+                        return SmsDialog(callback: _getNativeValue,);
+                      }
+                  );
+
+                  // _getNativeValue();
+                },
+                    child: Text('가져오기'))
+              ],
+            ),
           ],
         ),
       ),

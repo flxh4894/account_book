@@ -11,6 +11,16 @@ class AssetContent {
 
   AssetContent( {this.id, this.assetId, this.date, this.category, this.price, this.title, this.assetType} );
 
+  factory AssetContent.fromJson(Map<String, dynamic> json) => AssetContent(
+    id: json['id'],
+    category: json['category'],
+    title: json['title'],
+    assetId: json['asset_id'],
+    assetType: json['asset_type'],
+    price: json['price'],
+    date: json['date']
+  );
+
   Map<String, dynamic> toMap() => {
     'id': id,
     'category': category,
