@@ -130,7 +130,11 @@ class _GoalPageState extends State<GoalPage> {
     List<BarChartGroupData> list = <BarChartGroupData>[];
     int month = 0;
     for(var data in _goalController.monthAssetList){
-      list.add(makeGroupData(month, data.toDouble(),  false));
+      list.add(makeGroupData(
+          month,
+          data.toDouble() < 0 ? 0 : data.toDouble(),
+          false)
+      );
       month ++;
     }
 

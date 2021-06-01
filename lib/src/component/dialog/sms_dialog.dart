@@ -12,7 +12,7 @@ class SmsDialog extends StatefulWidget {
 }
 
 class _SmsDialogState extends State<SmsDialog> {
-  final TextEditingController _textDay = TextEditingController();
+  final TextEditingController _textDay = TextEditingController()..text = "60";
   bool smsFlag = false;
 
   @override
@@ -61,7 +61,7 @@ class _SmsDialogState extends State<SmsDialog> {
                         width: 50,
                         child: TextFormField(
                           textAlign: TextAlign.center,
-                          controller: _textDay..text = "60",
+                          controller: _textDay,
                           keyboardType: TextInputType.number,
                         )
                       ),
@@ -86,7 +86,7 @@ class _SmsDialogState extends State<SmsDialog> {
                         setState(() {
                           smsFlag = true;
                         });
-                        widget.callback();
+                        widget.callback(int.parse(_textDay.text));
                       }
                     },
                     child: Row(

@@ -1,4 +1,5 @@
 import 'package:accountbook/src/component/dialog/sms_dialog.dart';
+import 'package:accountbook/src/controller/sms_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -10,9 +11,7 @@ class SmsSettingsPage extends StatefulWidget {
 }
 
 class _SmsSettingsPageState extends State<SmsSettingsPage> {
-  static const platform = const MethodChannel('com.polymorph.account_book/read_sms');
-  String _value = 'null';
-
+  final SmsController _smsController = Get.find<SmsController>();
   Future<bool> _permissionCheck() async {
     bool per = true;
     Map<Permission, PermissionStatus> list = await [Permission.sms].request();
@@ -26,32 +25,10 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
     return per;
   }
 
-
   @override
   void initState() {
     _permissionCheck().then((value) => print(value));
     super.initState();
-  }
-
-  Future<void> _getNativeValue() async {
-    String value;
-    try {
-      List a = await platform.invokeMethod('getValue');
-      Get.back();
-      print( DateTime.now().subtract(Duration(days: 365)) );
-      Get.snackbar("SMS 가져오기", "${a.length}건 가져오기 성공",
-          snackPosition: SnackPosition.BOTTOM);
-      // a.forEach((element) {
-      //   print(element);
-      // });
-      value = a[0]['text'];
-    } on PlatformException catch (e) {
-      value = '네이티브 에러 : ${e.message}';
-    }
-
-    setState(() {
-      _value = value;
-    });
   }
 
   @override
@@ -69,17 +46,15 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
           children: [
             Row(
               children: [
-                Text('SMS가져오기'),
+                Text('SMS 가져오기'),
                 TextButton(onPressed: (){
                   showDialog(
                     barrierDismissible: false,
                     context: context,
                     builder: (context) {
-                      return SmsDialog(callback: _getNativeValue,);
+                      return SmsDialog(callback: _smsController.getNativeValue);
                     }
                   );
-
-                  // _getNativeValue();
                 },
                     child: Text('가져오기'))
               ],
@@ -87,18 +62,17 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
             Row(
               children: [
                 Text('SMS 자동 수신'),
-                TextButton(onPressed: (){
-                  showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (context) {
-                        return SmsDialog(callback: _getNativeValue,);
+                Obx(
+                  () => Switch(
+                      activeTrackColor: Colors.yellow,
+                      activeColor: Colors.orangeAccent,
+                      value: _smsController.receiveFlag.value,
+                      onChanged: (value) {
+                        print(value);
+                        _smsController.setReceiveFlag(value);
                       }
-                  );
-
-                  // _getNativeValue();
-                },
-                    child: Text('가져오기'))
+                  ),
+                )
               ],
             ),
           ],
