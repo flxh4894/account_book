@@ -1,5 +1,7 @@
+import 'package:accountbook/src/component/dialog/sms_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SmsSettingsPage extends StatefulWidget {
@@ -35,9 +37,13 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
     String value;
     try {
       List a = await platform.invokeMethod('getValue');
-      a.forEach((element) {
-        print(element);
-      });
+      Get.back();
+      print( DateTime.now().subtract(Duration(days: 365)) );
+      Get.snackbar("SMS 가져오기", "${a.length}건 가져오기 성공",
+          snackPosition: SnackPosition.BOTTOM);
+      // a.forEach((element) {
+      //   print(element);
+      // });
       value = a[0]['text'];
     } on PlatformException catch (e) {
       value = '네이티브 에러 : ${e.message}';
@@ -56,15 +62,28 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: Center(
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('네이티브 값'),
-            TextButton(onPressed: (){
-              _getNativeValue();
-            },
-            child: Text('$_value'))
+            Row(
+              children: [
+                Text('SMS가져오기'),
+                TextButton(onPressed: (){
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return SmsDialog(callback: _getNativeValue,);
+                    }
+                  );
+
+                  // _getNativeValue();
+                },
+                    child: Text('가져오기'))
+              ],
+            )
           ],
         ),
       ),

@@ -22,7 +22,7 @@ class MainActivity : FlutterActivity() {
             CHANNEL
         ).setMethodCallHandler { call, result ->
             if (call.method == "getValue") {
-                var smsList = mutableListOf<Map<String, String>>()
+                val smsList = mutableListOf<Map<String, String>>()
 
                 val cursor = contentResolver.query(
                     uriSms,
@@ -31,56 +31,88 @@ class MainActivity : FlutterActivity() {
                     null,
                     null
                 )
-                cursor?.moveToFirst()
 
-                var flag = true
-                while (flag) {
-                    val address = cursor!!.getString(1)
-                    val day = cursor!!.getLong(2)
-                    val body = cursor!!.getString(3)
+                if(cursor != null){
+                    cursor.moveToFirst()
+                    var flag = true
 
-                    // 삼성카드
-                    if (address.equals("15888900")) {
-                        val regText = Regex("(?<=:[0-9]{2}[ ,\n]).+")
-                        val regPrice = Regex("[0-9,-]+(,?[0-9]+)+원")
-                        val regTime = Regex("[0-9]{2}:[0-9]{2}")
-                        val regDate = Regex("[0-9]{2}/[0-9]{2}")
+                    while (flag) {
+                        val address = cursor.getString(1)
+                        val day = cursor.getLong(2)
+                        val body = cursor.getString(3)
 
-                        val time = regTime.find(body) // 시간
-                        val date = regDate.find(body) // 날짜
-                        val timeDate = date!!.value + " " + time!!.value // 날짜 + 시간
-                        val timestamp =
-                            DateFormat.format("yyyyMMddhhmm", Date(day)).toString() // 문자받은 시간
-                        val price = regPrice.find(body) // 금액
-                        val text = regText.find(body) // 거래내용
-                        var vText = text?.value?.replace("(금액)", "") // 거래내용 파싱
+                        // 커서 다음으로 이동 && Last Index 체크
+                        if (cursor.isLast)
+                            flag = false
+                        cursor.moveToNext()
 
-                        var list: List<String>
-                        if (vText != null) {
-                            list = vText.split(" ")
+                        if(body.contains("승인거절"))
+                            continue
 
-                            vText =
-                                if (list[0] == price?.value) list[1]
-                                else list[0]
-                        }
+                        // 삼성카드
+                        if (address.equals("15888900")) {
+                            val regPrice = Regex("[0-9,-]+(,?[0-9]+)+원")
+                            val price = regPrice.find(body) ?: continue // 금액 null 이면 Continue
+                            val timeDate = getDate(body) ?: continue
+                            val timestamp =
+                                DateFormat.format("yyyyMMddhhmm", Date(day)).toString() // 문자받은 시간
+                            val text = getSmsText(body, price.value)
+
+                            Log.d("번호",address.toString())
+                            Log.d("날짜",timeDate)
+                            Log.d("시간",timestamp.toString())
+                            Log.d("문자",text.toString())
+                            Log.d("가격", price.value.toString())
+                            Log.d("******","**********************")
 
                         smsList.add(
                             mapOf(
                                 Pair("address", address.toString()),
                                 Pair("date", timeDate),
                                 Pair("timestamp", timestamp),
-                                Pair("text", vText.toString()),
-                                Pair("price", price!!.value)
+                                Pair("text", text),
+                                Pair("price", price.value)
                             )
                         )
+                        }
                     }
-
-                    if (cursor.isLast)
-                        flag = false
-                    cursor.moveToNext()
                 }
+
                 result.success(smsList)
             }
         }
+    }
+
+    private fun getSmsText(body: String, price: String): String {
+
+        val regText = Regex("(?<=:[0-9]{2}[ ,\n]).+")
+        val text = regText.find(body) // 거래내용
+
+        return if(text != null) {
+            // 파싱 : (금액) 자르고 금액과 내용이 함께 붙어있는 경우 제거
+            // ex) (금액)57,000 스타벅스코리아
+            var vText = text.value.replace("(금액)", "") // 거래내용 파싱
+            val textList: List<String> = vText.split(" ")
+            vText =
+                if (textList[0] == price) textList[1]
+                else textList[0]
+
+            vText
+        } else {
+            body.replace("[Web발신]", "").replace(price,"")
+        }
+    }
+
+    // 날짜 정규식 자르기
+    private fun getDate(body: String): String? {
+        val regTime = Regex("[0-9]{2}:[0-9]{2}")
+        val regDate = Regex("[0-9]{2}/[0-9]{2}")
+
+        val time = regTime.find(body) // 시간
+        val date = regDate.find(body) // 날짜
+        if(time == null || date == null)
+            return null
+
+        return (date.value) + " " + (time.value) // 날짜 + 시간
     }
 }
