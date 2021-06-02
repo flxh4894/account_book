@@ -24,8 +24,6 @@ class DatabaseHelper {
           PRIMARY KEY("id" AUTOINCREMENT)
         )'''
       );
-      await initCategory(db);
-
       db.execute('''
         CREATE TABLE "assets" (
           "id"	INTEGER,
@@ -36,6 +34,7 @@ class DatabaseHelper {
           PRIMARY KEY("id" AUTOINCREMENT)
         )'''
       );
+      await initCategory(db);
 
       db.execute('''
         CREATE TABLE "credit_card" (

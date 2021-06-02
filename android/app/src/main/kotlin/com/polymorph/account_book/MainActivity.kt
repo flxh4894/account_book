@@ -69,7 +69,7 @@ class MainActivity : FlutterActivity() {
                             mapOf(
                                 Pair("address", address.toString()),
                                 Pair("date", timeDate),
-                                Pair("timestamp", timestamp),
+                                Pair("date", timestamp),
                                 Pair("text", text),
                                 Pair("price", price.value)
                             )

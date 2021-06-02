@@ -135,7 +135,7 @@ class CostController extends GetxController {
   void getCategoryList() async {
     final db = await database;
 
-    var list = await db.query("category");
+    var list = await db.query("category", where: "id != ?", whereArgs: ["-1"]);
     categoryList(list.map((e) => Category.fromJson(e)).toList());
   }
 

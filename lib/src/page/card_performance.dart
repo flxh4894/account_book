@@ -100,17 +100,25 @@ class _CardPerformancePageState extends State<CardPerformancePage> {
                   color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('달성 ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text('${_cardController.okay}개', style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold)),
-                    SizedBox(width: 20),
-                    Text('미달성 ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text('${_cardController.yet}개', style: TextStyle(fontSize: 18, color: Colors.blue, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        Text('달성 ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('${_cardController.okay}개', style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold)),
+                        SizedBox(width: 20),
+                        Text('미달성 ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('${_cardController.yet}개', style: TextStyle(fontSize: 18, color: Colors.blue, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text('※ 1일부터 말일까지 카드 사용 내역')
+                    
                   ],
-                ),
+                )
               ),
-            )
+            ),
           ]
       );
   }

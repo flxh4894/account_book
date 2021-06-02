@@ -15,7 +15,7 @@ class GoalController extends GetxController {
   RxList<int> monthAssetList = <int>[].obs; // 월별 저축금액 리스트
   RxInt yearTotalAsset = 0.obs; // 1년간 총 모은 금액
   RxList<InvestInfo> yearInvestList = <InvestInfo>[].obs; // 1년간 저축한 리스트
-  Rx<YearGoal> goal = new YearGoal().obs;
+  Rx<YearGoal> goal = new YearGoal(year: DateTime.now().year, id: -1, price: 0).obs;
 
   @override
   void onInit() {
@@ -24,10 +24,8 @@ class GoalController extends GetxController {
 
   void init(){
     monthAssetList.clear();
-    yearTotalAsset(0);
-    selectYearGoal();
     yearInvestList.clear();
-
+    selectYearGoal();
     getMonthTotalAsset();
     getYearInvest();
   }
@@ -144,15 +142,37 @@ class GoalController extends GetxController {
               tag: '보유현금 \n#사용에 따라 마이너스 표기 가능')
       );
     }
+    yearTotalAsset(0);
     yearTotalAsset(yearTotalAsset.value + totalCash);
   }
 
+  // 1년 목표금액 가져오기
   void selectYearGoal() async {
     final db = await database;
     var year = DateTime.now().year.toString();
     var list = await db.query("year_goal", where: "year = ?", whereArgs: [year], limit: 1);
 
-    goal( new YearGoal.fromJson(list[0])  );
+    if(list.length == 0)
+      goal(new YearGoal(year: DateTime.now().year, id: -1, price: 0));
+    else
+      goal( new YearGoal.fromJson(list[0])  );
+  }
+
+  // 1년 목표금액 설정하기
+  void insertYearGoal(int price) async {
+    final db = await database;
+    var year = DateTime.now().year;
+
+    var check = await db.query("year_goal", where: "year = ?", whereArgs: [year]);
+    if(check.length == 0){
+      var id = await db.insert("year_goal", {'year': year, 'price': price});
+      goal(new YearGoal(year: year, price: price, id: id));
+    } else {
+      await db.update("year_goal", {'year': year, 'price': price}, where: "year = ?", whereArgs: [year]);
+      var id = goal.value.id;
+      goal(new YearGoal(year: year, price: price, id: id));
+    }
+
   }
 
 }

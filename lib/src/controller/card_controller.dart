@@ -25,19 +25,45 @@ class CardController extends GetxController {
   // 추가된 카드 리스트 불러오기
   void getCreditCardList() async {
     final db = await database;
-    var list = await db.rawQuery(
-        "SELECT A.*, sum(B.price) as price "
-        "FROM credit_card A, daily_cost B "
-        "WHERE A.asset_id = B.asset_id GROUP BY B.asset_id ORDER BY price ASC"
-    );
-    cardList( list.map((e) => CreditCard.fromJson(e)).toList() );
 
-    okay(0);
-    yet(0);
-    cardList.forEach((element) {
-      element.price >= element.performance ? okay(okay.value + 1) :
-      yet(yet.value + 1);
+    DateTime date = DateTime.now();
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
+
+    // ** 초기화
+    cardList.clear(); // 카드리스트
+    okay(0); // 달성
+    yet(0); // 미달성
+    var list = await db.query("credit_card");
+
+    list.forEach((element) async {
+      var dbPrice = await db.rawQuery(
+        "SELECT SUM(price) AS price "
+        "FROM daily_cost "
+        "WHERE asset_id = ${element['asset_id']} "
+        "AND date BETWEEN '${yearMonth}01' AND '${yearMonth}31'"
+      );
+      int price = dbPrice[0]['price'];
+
+      cardList.add(
+        new CreditCard(
+          id: element['id'],
+          assetId: element['asset_id'],
+          price: price == null ? 0 : price,
+          tag: element['tag'],
+          cardNm: element['card_nm'],
+          performance: element['performance'],
+          payDate: element['pay_date']
+        )
+      );
+
+      if(price == null)
+        yet(yet.value + 1);
+      else
+        price >= element['performance'] ? okay(okay.value + 1) : yet(yet.value + 1);
     });
+
   }
 
   // 추가가능한 카드 리스트 불러오기

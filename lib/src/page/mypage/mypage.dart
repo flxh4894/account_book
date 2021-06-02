@@ -18,7 +18,7 @@ class MyPage extends StatelessWidget {
     return Column(
       children: [
         _rowTile('나의 자산', Icons.assessment_outlined, MyAssetsPage()),
-        _rowTile('자산', Icons.assessment_outlined, SmsSettingsPage()),
+        _rowTile('SMS 설정', Icons.email_outlined, SmsSettingsPage()),
         _rowTile('설정', Icons.settings_outlined, null),
       ],
     );

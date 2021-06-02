@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Text(title, style: TextStyle(fontSize: 16)),
-                Text(_utils.priceFormat(money.abs()),
+                Text(_utils.priceFormat(money),
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

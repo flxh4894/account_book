@@ -1,3 +1,4 @@
+import 'package:accountbook/src/component/dialog/year_goal_dialog.dart';
 import 'package:accountbook/src/controller/goal_controller.dart';
 import 'package:accountbook/src/model/invest_info.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
@@ -24,15 +25,17 @@ class _GoalPageState extends State<GoalPage> {
 
   Widget _body() {
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _header(),
-          _barChart(),
-          _needAssets(),
-          _currentSaveAssets(),
-          _myAssets()
-        ],
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _header(),
+            _barChart(),
+            _needAssets(),
+            _currentSaveAssets(),
+            _myAssets()
+          ],
+        ),
       ),
     );
   }
@@ -41,14 +44,18 @@ class _GoalPageState extends State<GoalPage> {
     return Container(
       color: Theme.of(context).primaryColor,
       padding: EdgeInsets.symmetric(vertical: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('2021년 목표 금액', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold) ),
-          SizedBox(height: 10),
-          Text('21,000,000원', style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold) ),
-        ],
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('${_goalController.goal.value.year}년 목표 저축 금액',
+                style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold) ),
+            SizedBox(height: 10),
+            Text('${_utils.priceFormat(_goalController.goal.value.price)}',
+                style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold) ),
+          ],
+        ),
       ),
     );
   }
@@ -168,6 +175,8 @@ class _GoalPageState extends State<GoalPage> {
   }
 
   Widget _needAssets() {
+    var price = _goalController.goal.value.price - _goalController.yearTotalAsset.value;
+    var monthPrice = price ~/ 12;
     return Container(
       margin: EdgeInsets.only(top: 10),
       color: Colors.white,
@@ -180,9 +189,9 @@ class _GoalPageState extends State<GoalPage> {
           Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('12,900,000 원', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
+                Text('${_utils.priceFormat(price)}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
                 SizedBox(height: 5),
-                Text('한달에 2,500,000 원', style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.5))),
+                Text('한달에 ${_utils.priceFormat(monthPrice)}', style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.5))),
               ]
           ),
         ],
@@ -200,11 +209,6 @@ class _GoalPageState extends State<GoalPage> {
             SizedBox(height: 20),
             for(InvestInfo invest in _goalController.yearInvestList)
               _assetTile(invest.title, '#${invest.tag}', invest.price),
-            // _assetTile('마이여행파트너적금', '#우리은행 #여행자금', 2500000),
-            // _assetTile('펀드', '#키움증권', 200000),
-            // _assetTile('주식', '#키움증권', 2800000),
-            // _assetTile('비트코인', '#업비트', 100000),
-            // _assetTile('보유현금', '#신한은행', 2000000),
           ],
         ),
       ),
@@ -240,6 +244,24 @@ class _GoalPageState extends State<GoalPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         title: Text('내 목표'),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return YearGoalDialog();
+                  }
+              );
+            },
+            child: Row(
+              children: [
+                Text('목표금액 설정'),
+                SizedBox(width: 20)
+              ],
+            ),
+          )
+        ],
       ),
       body: _body(),
     );

@@ -450,7 +450,7 @@ class _NewCostPageState extends State<NewCostPage> {
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                          child: Text('${_costController.categoryList[index].name} $categoryId'),
+                          child: Text('${_costController.categoryList[index].name} '),
                         ),
                       );
                     },

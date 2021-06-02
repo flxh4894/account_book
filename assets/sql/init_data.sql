@@ -1,3 +1,4 @@
+INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('-1', '미분류', '2');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('1', '월급', '1');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('2', '부수입', '1');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('3', '용돈', '1');
@@ -15,3 +16,4 @@ INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('14', '�
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('15', '교육', '2');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('16', '패션/미용', '2');
 INSERT OR replace INTO "main"."category" ("id", "name", "type") VALUES ('17', '기타', '2');
+INSERT OR replace INTO "main"."assets" ("id", "name", "memo", "type", "is_favorite") VALUES ('-1', '미분류', '미분류', '0', '0');

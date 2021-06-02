@@ -81,7 +81,7 @@ class SmsController extends GetxController{
   void _setSmsMessage(SmsMessage msg) {
     var price = _parsePrice(msg.body);
     // 가격정보가 없거나, 승인이 거절된 내용은 빼버림
-    if(price == null || msg.body.contains("승인거절")) {
+    if(price == null || msg.body.contains("승인거절") || msg.body.contains("인증번호")) {
       return;
     }
 
@@ -94,9 +94,9 @@ class SmsController extends GetxController{
             date: date,
             title: text,
             price: int.parse(price),
-            category: 17,
-            assetType: 2,
-            assetId: 1
+            category: -1, // 카테고리 : 미분류
+            assetType: 2, // 지출
+            assetId: -1 // 자산 : 미분류
         )
     );
   }

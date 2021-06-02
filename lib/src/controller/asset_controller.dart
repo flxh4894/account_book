@@ -24,7 +24,7 @@ class AssetController extends GetxController {
 
   void getAssetInfoList() async {
     final db = await database;
-    var list = await db.query("assets", orderBy: "is_favorite DESC");
+    var list = await db.query("assets", orderBy: "is_favorite DESC", where: "id != ?", whereArgs: [-1]);
     assetInfoList( list.map((e) => AssetInfo.fromJson(e)).toList() );
   }
 
