@@ -55,7 +55,7 @@ class MainActivity : FlutterActivity() {
                             val price = regPrice.find(body) ?: continue // 금액 null 이면 Continue
                             val timeDate = getDate(body) ?: continue
                             val timestamp =
-                                DateFormat.format("yyyyMMddhhmm", Date(day)).toString() // 문자받은 시간
+                                DateFormat.format("yyyyMMddHHmm", Date(day)).toString() // 문자받은 시간
                             val text = getSmsText(body, price.value)
 
                             Log.d("번호",address.toString())

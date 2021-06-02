@@ -169,6 +169,7 @@ class _EditCostPageState extends State<EditCostPage> {
           Expanded(
               child: TextFormField(
                   style: TextStyle(fontSize: 16),
+                  maxLines: 1,
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: EdgeInsets.all(10),
@@ -185,7 +186,9 @@ class _EditCostPageState extends State<EditCostPage> {
                     ),
                   ),
                   keyboardType: type,
-                  controller: controller))
+                  controller: controller,
+              )
+          )
         ],
       ),
     );

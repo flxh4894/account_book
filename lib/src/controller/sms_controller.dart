@@ -66,13 +66,13 @@ class SmsController extends GetxController{
 
         smsList.clear();
         dbList.forEach((element) {
-          var date = DateFormat('yyyyMMddhhmm').format(element.date);
+          var date = DateFormat('yyyyMMddHHmm').format(element.date);
           if( int.parse(date) > int.parse(lastDate) ){
             _setSmsMessage(element);
           }
         });
 
-        insertSmsContent(smsList);
+        // insertSmsContent(smsList);
       }
     }
   }
@@ -80,13 +80,18 @@ class SmsController extends GetxController{
   // SMS 파싱 및 list add
   void _setSmsMessage(SmsMessage msg) {
     var price = _parsePrice(msg.body);
+    var timeDate = _parseDate(msg.body);
     // 가격정보가 없거나, 승인이 거절된 내용은 빼버림
-    if(price == null || msg.body.contains("승인거절") || msg.body.contains("인증번호")) {
+    if(price == null
+        || msg.body.contains("승인거절")
+        || msg.body.contains("인증번호")
+        || timeDate == null
+    ) {
       return;
     }
 
-    var date = DateFormat('yyyyMMddhhmm').format(msg.date);
-    var text = _parseDate(msg.body, price);
+    var date = DateFormat('yyyyMMddHHmm').format(msg.date);
+    var text = _parseText(msg.body, price);
     price = price.replaceAll(",", "").replaceAll("원", "");
 
     smsList.add(
@@ -113,7 +118,7 @@ class SmsController extends GetxController{
 
       smsList.clear();
       list.forEach((element) {
-        var date = DateFormat('yyyyMMddhhmm').format(element.date);
+        var date = DateFormat('yyyyMMddHHmm').format(element.date);
         if( int.parse(date) >= int.parse(selectedDay) ){
           _setSmsMessage(element);
         }
@@ -130,7 +135,8 @@ class SmsController extends GetxController{
     }
   }
 
-  String _parseDate(String body, String price) {
+  // 본문내용(결제한곳)파싱
+  String _parseText(String body, String price) {
     var regText = RegExp("(?<=:[0-9]{2}[ ,\n]).+");
     var text = regText.stringMatch(body);
     if(text == null)
@@ -139,6 +145,19 @@ class SmsController extends GetxController{
     return text;
   }
 
+  // 날짜, 시간 파싱
+  String _parseDate(String body) {
+    var regTime = RegExp("[0-9]{2}:[0-9]{2}");
+    var regDate = RegExp("[0-9]{2}/[0-9]{2}");
+    var time = regTime.stringMatch(body);
+    var date = regDate.stringMatch(body);
+    if(time == null || date == null)
+      return null;
+
+    return "$time$date";
+  }
+
+  // 결제 금액 파싱
   String _parsePrice(String body) {
     var regPrice = RegExp(r'[0-9,-]+(,?[0-9]+)+원');
     var price = regPrice.stringMatch(body);

@@ -6,8 +6,8 @@
     <uses-permission android:name="android.permission.READ_SMS"/>
     
     <application
-        android:icon="@mipmap/ic_launcher"
-        android:label="account_book">
+        android:icon="@mipmap/launcher_icon"
+        android:label="도짱's 가계부">
         <receiver
             android:name=".SmsReceiver"
             android:enabled="true"
