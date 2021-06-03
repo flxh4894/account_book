@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
     );
 
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: '자산을 늘려라',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

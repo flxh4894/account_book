@@ -1,6 +1,7 @@
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/helper/db_helper.dart';
 import 'package:accountbook/src/model/asset_content.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -107,14 +108,30 @@ class SmsController extends GetxController{
   }
 
   // 네이티브에서 메세지 모두 가져오기
-  Future<void> getNativeValue(int day) async {
+  void getNativeValue(int day) async {
     String value;
     try {
       SmsQuery query = new SmsQuery();
-      var list = await query.getAllSms;
-
       String selectedDay = DateFormat('yyyyMMdd').format(
           DateTime.now().subtract(Duration(days: day))) + "0000";
+
+      // query.getAllSms.then((value) {
+      //   smsList.clear();
+      //   value.forEach((element) {
+      //     var date = DateFormat('yyyyMMddHHmm').format(element.date);
+      //     if( int.parse(date) >= int.parse(selectedDay) ){
+      //       _setSmsMessage(element);
+      //     }
+      //   });
+      //
+      //   insertSmsContent(smsList);
+      //
+      //   Get.back();
+      //   Get.snackbar("SMS 가져오기", "${smsList.length}건 가져오기 성공",
+      //       snackPosition: SnackPosition.BOTTOM);
+      // });
+
+      var list = await query.getAllSms;
 
       smsList.clear();
       list.forEach((element) {
@@ -123,6 +140,7 @@ class SmsController extends GetxController{
           _setSmsMessage(element);
         }
       });
+
 
       insertSmsContent(smsList);
 
@@ -134,6 +152,20 @@ class SmsController extends GetxController{
       value = '네이티브 에러 : ${e.message}';
     }
   }
+
+  // 네이티브에서 직접 가지고 오는 방법
+  // Future<void> getSmsAllMessage(int a) async {
+  //   String batteryLevel;
+  //   try {
+  //     List result = await platform.invokeMethod('getValue');
+  //     result.forEach((element) {
+  //       print(element);
+  //     });
+  //
+  //   } on PlatformException catch (e) {
+  //     batteryLevel = "Failed to get battery level: '${e.message}'.";
+  //   }
+  // }
 
   // 본문내용(결제한곳)파싱
   String _parseText(String body, String price) {

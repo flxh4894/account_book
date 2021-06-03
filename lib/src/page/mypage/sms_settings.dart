@@ -1,5 +1,7 @@
 import 'package:accountbook/src/component/dialog/sms_dialog.dart';
 import 'package:accountbook/src/controller/sms_controller.dart';
+import 'package:accountbook/src/page/mypage/sms/ignore_sms.dart';
+import 'package:accountbook/src/page/mypage/sms/sms_asset_match.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -21,7 +23,6 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
         per = false;
       }
     });
-
     return per;
   }
 
@@ -29,6 +30,34 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
   void initState() {
     _permissionCheck().then((value) => print(value));
     super.initState();
+  }
+
+  Widget _rowTile(String title, Widget widget) {
+    widget = widget == null ? Container() : widget;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16,vertical: 10),
+      margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 1.0,
+            spreadRadius: 1.0,
+            offset: Offset(2.0, 2.0), // shadow direction: bottom right
+          )
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(fontSize: 16)),
+          widget
+        ],
+      ),
+    );
   }
 
   @override
@@ -40,41 +69,42 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
         backgroundColor: Colors.white,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Text('SMS 가져오기'),
-                TextButton(onPressed: (){
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) {
-                      return SmsDialog(callback: _smsController.getNativeValue);
-                    }
-                  );
-                },
-                    child: Text('가져오기'))
-              ],
+            _rowTile('SMS 가져오기',
+                GestureDetector(
+                    onTap: (){
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) {
+                            return SmsDialog(callback: _smsController.getNativeValue);
+                          }
+                      );
+                    },
+                    child: Text('가져오기', style: TextStyle(color: Theme.of(context).primaryColor))
+                )
             ),
-            Row(
-              children: [
-                Text('SMS 자동 수신'),
+            _rowTile('SMS 자동 수신',
                 Obx(
-                  () => Switch(
+                      () => Switch(
                       activeTrackColor: Colors.yellow,
                       activeColor: Colors.orangeAccent,
                       value: _smsController.receiveFlag.value,
                       onChanged: (value) {
-                        print(value);
                         _smsController.setReceiveFlag(value);
                       }
                   ),
                 )
-              ],
             ),
+            GestureDetector(
+              onTap: () => Get.to(() => IgnoreSmsListPage()),
+              child: _rowTile('연동 제외 번호 설정', null)
+            ),
+            GestureDetector(
+              onTap: () => Get.to(() => SmsAssetMatchPage()),
+              child: _rowTile('문구별 자산 연결', null)),
           ],
         ),
       ),
