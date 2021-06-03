@@ -1,7 +1,7 @@
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/helper/db_helper.dart';
 import 'package:accountbook/src/model/asset_content.dart';
-import 'package:flutter/foundation.dart';
+import 'package:accountbook/src/model/sms_asset_list.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -21,11 +21,13 @@ class SmsController extends GetxController{
   }
   List<AssetContent> smsList = <AssetContent>[];
   RxBool receiveFlag = false.obs;
+  RxList<SmsAssetList> smsAssetList = <SmsAssetList>[].obs;
 
   @override
   void onInit() {
     _getReceiveFlag();
     getLastSmsDate();
+    selectSmsAssetList();
     super.onInit();
   }
 
@@ -82,7 +84,8 @@ class SmsController extends GetxController{
   void _setSmsMessage(SmsMessage msg) {
     var price = _parsePrice(msg.body);
     var timeDate = _parseDate(msg.body);
-    // 가격정보가 없거나, 승인이 거절된 내용은 빼버림
+
+    // 입력을 안하는 경우 작성
     if(price == null
         || msg.body.contains("승인거절")
         || msg.body.contains("인증번호")
@@ -91,9 +94,24 @@ class SmsController extends GetxController{
       return;
     }
 
+    /* 데이터 파싱
+    * date : 문자를 받은 시간을 기준으로
+    * text : 정규식을 써서
+    * price : 정규식 + 콤마와 글자 제거 (숫자만 표기되도록)
+    * */
     var date = DateFormat('yyyyMMddHHmm').format(msg.date);
     var text = _parseText(msg.body, price);
     price = price.replaceAll(",", "").replaceAll("원", "");
+
+    var assetId = -1;
+    smsAssetList.forEach((element) {
+      if(msg.body.contains(element.word)){
+        assetId = element.id;
+        return;
+      }
+    });
+
+    print(assetId);
 
     smsList.add(
         AssetContent(
@@ -102,7 +120,7 @@ class SmsController extends GetxController{
             price: int.parse(price),
             category: -1, // 카테고리 : 미분류
             assetType: 2, // 지출
-            assetId: -1 // 자산 : 미분류
+            assetId: assetId // 자산 : 미분류
         )
     );
   }
@@ -115,22 +133,6 @@ class SmsController extends GetxController{
       String selectedDay = DateFormat('yyyyMMdd').format(
           DateTime.now().subtract(Duration(days: day))) + "0000";
 
-      // query.getAllSms.then((value) {
-      //   smsList.clear();
-      //   value.forEach((element) {
-      //     var date = DateFormat('yyyyMMddHHmm').format(element.date);
-      //     if( int.parse(date) >= int.parse(selectedDay) ){
-      //       _setSmsMessage(element);
-      //     }
-      //   });
-      //
-      //   insertSmsContent(smsList);
-      //
-      //   Get.back();
-      //   Get.snackbar("SMS 가져오기", "${smsList.length}건 가져오기 성공",
-      //       snackPosition: SnackPosition.BOTTOM);
-      // });
-
       var list = await query.getAllSms;
 
       smsList.clear();
@@ -140,7 +142,6 @@ class SmsController extends GetxController{
           _setSmsMessage(element);
         }
       });
-
 
       insertSmsContent(smsList);
 
@@ -168,12 +169,15 @@ class SmsController extends GetxController{
   // }
 
   // 본문내용(결제한곳)파싱
+  // 결제한 곳 파싱
   String _parseText(String body, String price) {
     var regText = RegExp("(?<=:[0-9]{2}[ ,\n]).+");
     var text = regText.stringMatch(body);
     if(text == null)
       text = body.replaceAll("[Web발신]", "").replaceAll(price, "");
-
+    else { // 정규식으로 자른 내용 추가 파싱 Replace (지속 추가 필요)
+      text = text.replaceAll("(금액)", "").replaceAll(price, "").replaceAll(" ", "");
+    }
     return text;
   }
 
@@ -208,13 +212,42 @@ class SmsController extends GetxController{
           where: "price = ? and title = ? and date = ?",
           whereArgs: [element.price, element.title, element.date]
       );
-      var isExist = list.length;
 
-      if(isExist == 0)
+      if(list.length == 0) // 테이블에 해당 데이터가 없는 경우에 Insert
         batch.insert("daily_cost", element.toMap());
     });
 
+    /* 커밋 후 다시 불러옴 */
     batch.commit();
     _costController.getMonthCostContent(DateTime.now());
+  }
+
+  // SMS 문구별 자산 연동 삽입
+  void insertSmsAssetList(String word, int assetId) async {
+    final db = await database;
+    
+    int id = await db.insert("sms_asset_matcher", {"word": word, "asset_id": assetId});
+    print("SMS 자산 아이디 : $id");
+    selectSmsAssetList();
+
+  }
+
+  // SMS 문구별 자산 연동 가져오기
+  void selectSmsAssetList() async {
+    final db = await database;
+
+    var list = await db.rawQuery(
+      "SELECT "
+          "A.id AS id, "
+          "A.name AS card_nm, "
+          "A.memo AS card_tag, "
+          "B.word AS word "
+      "FROM "
+          "assets A, sms_asset_matcher B "
+      "WHERE "
+          "A.id = B.asset_id"
+    );
+
+    smsAssetList( list.map((e) => SmsAssetList.fromJson(e)).toList() );
   }
 }

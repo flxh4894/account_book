@@ -15,7 +15,7 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = join(await getDatabasesPath(), 'account_book.db');
 
-    return await openDatabase(path, version: 1, onCreate: (db, version) async {
+    return await openDatabase(path, version: 4, onCreate: (db, version) async {
       db.execute('''
         CREATE TABLE category (
           "id"	INTEGER,
@@ -58,6 +58,15 @@ class DatabaseHelper {
         )'''
       );
 
+      db.execute('''
+        CREATE TABLE "sms_asset_matcher" (
+          "id"	INTEGER,
+          "word"	TEXT NOT NULL,
+          "asset_id"	INTEGER NOT NULL,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        )'''
+      );
+
       return db.execute('''
         CREATE TABLE "daily_cost" (
           "id"	INTEGER,
@@ -71,11 +80,22 @@ class DatabaseHelper {
           PRIMARY KEY("id" AUTOINCREMENT)
         )'''
       );
-    }, onUpgrade: (db, oldVersion, newVersion) {});
+    }, onUpgrade: (db, oldVersion, newVersion) {
+      return db.execute('''
+        CREATE TABLE "sms_asset_matcher" (
+          "id"	INTEGER,
+          "word"	TEXT NOT NULL,
+          "asset_id"	INTEGER NOT NULL,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        )'''
+      );
+    });
   }
 
   // 카테고리 초기화
   Future initCategory(Database db) async {
+    print("카테고리 초기화");
+
     Batch batch = db.batch();
 
     String sql = await rootBundle.loadString("assets/sql/init_data.sql");

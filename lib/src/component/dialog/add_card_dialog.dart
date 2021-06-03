@@ -149,7 +149,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
                               ).toList(),
                               onChanged: (newValue) {},
                             ) :
-                            Text('등록 가능한 카드가 없습니다.')
+                            Text('마이페이지 ➡ \n은행 및 카드관리 에서 카드를 등록해 주세요.')
                           )
                         ],
                       ),

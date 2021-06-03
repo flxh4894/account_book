@@ -1,7 +1,11 @@
 import 'package:accountbook/src/component/dialog/sms_asset_match_dialog.dart';
+import 'package:accountbook/src/controller/sms_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SmsAssetMatchPage extends StatelessWidget {
+  final SmsController _smsController = Get.find<SmsController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,10 +25,15 @@ class SmsAssetMatchPage extends StatelessWidget {
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
         ),
-        _rowTile('삼성(1234) 이*원', "삼성카드", "#탭탭오"),
-        _rowTile('국민(0102) 이*원', "국민카드", "#나라사랑카드"),
-        _rowTile('삼성(5612) 이*원', "삼성카드", "#더파이브"),
-        _rowTile('신한(1022) 이*원', "신한카드", "#네이버페이"),
+        Obx(
+          () => Expanded(
+            child: ListView.builder(
+              itemCount: _smsController.smsAssetList.length,
+              itemBuilder: (context, index) {
+                return _rowTile(_smsController.smsAssetList[index].word, _smsController.smsAssetList[index].cardNm, _smsController.smsAssetList[index].cardTag);
+            }),
+          ),
+        ),
       ],
     );
   }
@@ -72,6 +81,7 @@ class SmsAssetMatchPage extends StatelessWidget {
           Text('$text'),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('$card'),
               Text(tag, style: TextStyle(

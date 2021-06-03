@@ -1,4 +1,5 @@
 import 'package:accountbook/src/controller/asset_controller.dart';
+import 'package:accountbook/src/controller/sms_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'add_asset_dialog.dart';
@@ -12,6 +13,7 @@ class _SmsAssetMatchDialogState extends State<SmsAssetMatchDialog> {
 
   final TextEditingController _text = TextEditingController();
   final AssetController _assetController = Get.put(AssetController());
+  final SmsController _smsController = Get.find<SmsController>();
 
   String selected;
   int assetId = -1;
@@ -78,6 +80,7 @@ class _SmsAssetMatchDialogState extends State<SmsAssetMatchDialog> {
                                 fontSize: 16
                               ),
                               decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
                                 hintText: 'ex) OO카드(1234) 홍*동',
                                 isDense: true,
                                 border: OutlineInputBorder(
@@ -98,7 +101,9 @@ class _SmsAssetMatchDialogState extends State<SmsAssetMatchDialog> {
                           Text('자산 : ', style: TextStyle(fontSize: 16)),
                           Expanded(
                             child: Obx(
-                              () => DropdownButton(
+                              () => _assetController.assetInfoList.length == 0 ?
+                              Text('마이페이지 ➡ \n은행 및 카드관리 에서 자산을 등록해 주세요.') :
+                              DropdownButton(
                                 isExpanded: true,
                                 elevation: 1,
                                 value: selected,
@@ -135,7 +140,8 @@ class _SmsAssetMatchDialogState extends State<SmsAssetMatchDialog> {
                   ),
                   GestureDetector(
                     onTap: () {
-
+                      _smsController.insertSmsAssetList(_text.text, assetId);
+                      Get.back();
                     },
                     child: Row(
                       children: [

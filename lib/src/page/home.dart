@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Text('자세히', style: TextStyle(color: Colors.black.withOpacity(0.5)))
+          Text('자세히(미구현!!!)', style: TextStyle(color: Colors.black.withOpacity(0.5)))
         ],
       ),
     );

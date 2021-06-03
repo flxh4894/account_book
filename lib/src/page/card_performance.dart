@@ -187,7 +187,7 @@ class _CardPerformancePageState extends State<CardPerformancePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('등록된 카드 또는 거래내역이 없습니다.'),
+        Text('마이페이지 > 은행 및 카드관리에서 카드를 등록해 주세요.'),
         GestureDetector(
           onTap: () {
             _cardController.getAddableCardList();
