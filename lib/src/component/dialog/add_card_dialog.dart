@@ -230,7 +230,7 @@ class _AddCardDialogState extends State<AddCardDialog> {
 
                     _cardController.insertCardInfo(card);
                     Get.back();
-                  }, child: Text('추가')),
+                  }, child: Text('추가', style: TextStyle(color: Colors.blue)) ),
                   TextButton(onPressed: () => Get.back(), child: Text('취소')),
                 ],
               )

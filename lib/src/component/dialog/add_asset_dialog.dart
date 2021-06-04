@@ -166,7 +166,7 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
                       type: _assetTypeList.indexOf(_assetType) + 1
                     ));
                     Get.back();
-                  }, child: Text('추가')),
+                  }, child: Text('추가', style: TextStyle(color: Colors.blue)) ),
                   TextButton(onPressed: () => Get.back(), child: Text('취소')),
                 ],
               )

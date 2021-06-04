@@ -1,3 +1,4 @@
+import 'package:accountbook/src/page/mypage/asset_management.dart';
 import 'package:accountbook/src/page/mypage/my_assets.dart';
 import 'package:accountbook/src/page/mypage/sms_settings.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class MyPage extends StatelessWidget {
       children: [
         _rowTile('나의 자산', Icons.assessment_outlined, MyAssetsPage()),
         _rowTile('SMS 설정', Icons.email_outlined, SmsSettingsPage()),
-        _rowTile('은행 및 카드관리', Icons.paid_outlined, SmsSettingsPage()),
+        _rowTile('은행 및 카드관리', Icons.paid_outlined, AssetManagementPage()),
         _rowTile('설정', Icons.settings_outlined, null),
       ],
     );

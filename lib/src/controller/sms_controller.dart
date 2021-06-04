@@ -238,7 +238,7 @@ class SmsController extends GetxController{
 
     var list = await db.rawQuery(
       "SELECT "
-          "A.id AS id, "
+          "B.id AS id, "
           "A.name AS card_nm, "
           "A.memo AS card_tag, "
           "B.word AS word "
@@ -249,5 +249,19 @@ class SmsController extends GetxController{
     );
 
     smsAssetList( list.map((e) => SmsAssetList.fromJson(e)).toList() );
+  }
+
+  // SMS 문구별 자산 연동 삭제
+  void deleteSmsAssetList(List<int> list) async {
+    final db = await database;
+    Batch batch = db.batch();
+
+    list.forEach((element) {
+      batch.delete("sms_asset_matcher", where: "id = ?", whereArgs: [element]);
+    });
+    batch.commit();
+    selectSmsAssetList();
+
+    Get.back();
   }
 }
