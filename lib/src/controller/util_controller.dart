@@ -1,9 +1,15 @@
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UtilController extends GetxController {
   // 날짜 (현재일 기본값)
   Rx<DateTime> _date = DateTime.now().obs;
   DateTime get date => _date.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+  }
 
   // 월 변경
   void changeDate(int count) {

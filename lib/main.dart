@@ -1,16 +1,27 @@
 import 'package:accountbook/src/controller/card_controller.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
+import 'package:accountbook/src/controller/sms_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/page/bottom_navigation.dart';
+import 'package:accountbook/src/page/guide/guide_main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
+  Future<dynamic> _isFirstUser() async {
+    bool isFirst = true;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isFirst = prefs.getBool("isFirst") == null ? true : false;
+
+    return isFirst;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +67,18 @@ class MyApp extends StatelessWidget {
         Get.put(UtilController());
         Get.put(CostController());
         Get.put(CardController());
+        Get.put(SmsController());
       }),
-      home: BottomNavigationPage()
+      home: FutureBuilder(
+          future: _isFirstUser(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.data == true) {
+              return GuideMain();
+            } else {
+              return BottomNavigationPage();
+            }
+          }
+      )
     );
   }
 }
