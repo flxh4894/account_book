@@ -9,7 +9,7 @@ class AssetManagementEditPage extends StatefulWidget {
 }
 
 class _AssetManagementEditPageState extends State<AssetManagementEditPage> {
-  final AssetController _assetController = Get.find<AssetController>();
+  final AssetController _assetController = Get.put(AssetController());
   final AssetInfo content = Get.arguments;
   final TextEditingController _textName = TextEditingController();
   final TextEditingController _textTag = TextEditingController();

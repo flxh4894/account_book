@@ -32,10 +32,15 @@ class GoalController extends GetxController {
 
   // 월별 수익
   Future<List> getMonthIncome(Database db) async {
+    final date = DateTime.now();
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
     var list = await db.rawQuery(
         "SELECT sum(price) AS 'price', substr(date,5,2) AS 'date' "
         "FROM daily_cost "
-        "WHERE asset_type = 1 "
+        "WHERE asset_type = 1 AND "
+        "date BETWEEN ${yearMonth}01010000 AND ${yearMonth}12312359 "
         "GROUP by substr(date,1,6)");
     List data = List.generate(12, (i) => 0);
 
@@ -49,10 +54,15 @@ class GoalController extends GetxController {
 
   // 월별 지출
   Future<List> getMonthExpense(Database db) async {
+    final date = DateTime.now();
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
     var list = await db.rawQuery(
         "SELECT sum(price) AS 'price', substr(date,5,2) AS 'date' "
             "FROM daily_cost "
-            "WHERE asset_type = 2 "
+            "WHERE asset_type = 2 AND "
+            "date BETWEEN ${yearMonth}01010000 AND ${yearMonth}12312359 "
             "GROUP by substr(date,1,6)");
     List data = List.generate(12, (i) => 0);
 
@@ -66,10 +76,15 @@ class GoalController extends GetxController {
 
   // 월별 투자
   Future<List> getMonthInvest(Database db) async {
+    final date = DateTime.now();
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
     var list = await db.rawQuery(
         "SELECT sum(price) AS 'price', substr(date,5,2) AS 'date' "
             "FROM daily_cost "
-            "WHERE asset_type = 3 "
+            "WHERE asset_type = 3 AND "
+            "date BETWEEN ${yearMonth}01010000 AND ${yearMonth}12312359 "
             "GROUP by substr(date,1,6)");
     List data = List.generate(12, (i) => 0);
 
@@ -84,11 +99,16 @@ class GoalController extends GetxController {
   // 1년간 투자 내역
   void getYearInvest() async {
     final db = await database;
+    final date = DateTime.now();
+    final year = date.year;
+    final month = date.month < 10 ? '0${date.month}' : date.month;
+    final yearMonth = '$year$month';
 
     var list = await db.rawQuery(
         "SELECT B.name, B.memo, B.id, SUM(A.price) AS 'price' "
         "FROM daily_cost A, assets B "
-        "WHERE A.asset_id = B.id AND A.asset_type = 3 "
+        "WHERE A.asset_id = B.id AND A.asset_type = 3 AND "
+        "date BETWEEN ${yearMonth}01010000 AND ${yearMonth}12312359 "
         "GROUP BY B.id");
 
     yearInvestList( list.map((e) => InvestInfo.fromJson(e)).toList() );

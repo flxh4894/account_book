@@ -1,22 +1,34 @@
 import 'package:accountbook/src/controller/asset_controller.dart';
 import 'package:accountbook/src/model/asset_info.dart';
+import 'package:accountbook/src/model/daily_cost.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 // 자산추가 다이어로그
-class AddAssetDialog extends StatefulWidget {
+class AddBaseAssetDialog extends StatefulWidget {
+  final int assetType;
+  AddBaseAssetDialog({this.assetType});
+
   @override
-  _AddAssetDialogState createState() => _AddAssetDialogState();
+  _AddBaseAssetDialogState createState() => _AddBaseAssetDialogState();
 }
 
-class _AddAssetDialogState extends State<AddAssetDialog> {
+class _AddBaseAssetDialogState extends State<AddBaseAssetDialog> {
   final AssetController _assetController = Get.find<AssetController>();
 
-  final TextEditingController _textName = TextEditingController();
-  final TextEditingController _textTag = TextEditingController();
-  final _assetTypeList = ['현금', '은행(통장)', '신용(체크)카드', '투자', '기타'];
-  String _assetType = '현금'; // 기본값 : 현금
-  int _isFavorite = 0; // 즐겨찾기 설정 기본값 : false
+  final TextEditingController _textPrice = TextEditingController();
+  final _assetTypeList = ['현금', '은행(통장)', '', '투자', '대출', '기타'];
+  String _assetType;
+  String _assetNm;
+  int _assetId = -1;
+
+
+  @override
+  void initState() {
+    _assetType = _assetTypeList[widget.assetType - 1];
+    _assetController.selectBaseAssetList(widget.assetType);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +39,7 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
         elevation: 1,
         backgroundColor: Colors.white,
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.7,
+          height: 350,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -41,7 +53,7 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
                   color: Theme.of(context).primaryColor,
                 ),
                 child: Center(
-                    child: Text('자산추가',
+                    child: Text('나의 자산 추가',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -57,100 +69,94 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
                     children: [
                       Row(
                         children: [
-                          Text('이름'),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: TextFormField(
-                              style: TextStyle(fontSize: 14),
-                              decoration: InputDecoration(
-                                isDense: true,
-                                hintText: 'ex) 삼성카드',
-                                contentPadding: EdgeInsets.all(10),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                  borderSide:
-                                  BorderSide(color: Colors.black.withOpacity(0.3)),
-                                ),
-                              ),
-                              controller: _textName,
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text('태그'),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: TextFormField(
-                              style: TextStyle(fontSize: 14),
-                              decoration: InputDecoration(
-                                hintText: 'ex) taptap O',
-                                isDense: true,
-                                contentPadding: EdgeInsets.all(10),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                  borderSide:
-                                  BorderSide(color: Colors.black.withOpacity(0.3)),
-                                ),
-                              ),
-                              controller: _textTag,
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text('분류'),
+                          Text('구분'),
                           SizedBox(width: 20),
                           Expanded(
-                            child: DropdownButton(
-                              isExpanded: true,
-                              elevation: 1,
-                              value: _assetType,
-                              items: _assetTypeList.map((e) =>
-                                  DropdownMenuItem(
-                                    value: e,
-                                    child: Text(e, style: TextStyle(fontSize: 14))
-                                  )
-                              ).toList(),
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _assetType = newValue;
-                                });
-                              },
+                            child: TextFormField(
+                              readOnly: true,
+                              style: TextStyle(fontSize: 14),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: EdgeInsets.all(10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide:
+                                  BorderSide(color: Colors.black.withOpacity(0.3)),
+                                ),
+                              ),
+                              initialValue: _assetType,
                             ),
                           )
                         ],
                       ),
                       Row(
                         children: [
-                          Text('즐겨찾기 설정'),
-                          IconButton(icon: _isFavorite == 1 ?
-                            Icon(Icons.favorite, color: Colors.pinkAccent)
-                            : Icon(Icons.favorite_border_outlined, color: Colors.grey.withOpacity(0.5)),
-                              onPressed: (){
-                                setState(() {
-                                  if(_isFavorite == 0)
-                                    _isFavorite = 1;
-                                  else
-                                    _isFavorite = 0;
-                                });
-                              })
+                          Text('자산'),
+                          SizedBox(width: 20),
+                          Expanded(
+                            child: Obx(
+                              () {
+                                var asset = _assetController.baseAssetList;
+                                if(asset.length != 0){
+                                  _assetNm = _assetController.baseAssetList[0].name;
+                                  _assetId = _assetController.baseAssetList[0].id;
+                                }
+                                return DropdownButton(
+                                  isExpanded: true,
+                                  elevation: 1,
+                                  value: _assetNm,
+                                  items: _assetController.baseAssetList.map((
+                                      e) {
+                                    return DropdownMenuItem(
+                                        value: e.name,
+                                        onTap: () {
+                                          setState(() {
+                                            _assetId = e.id;
+                                          });
+                                        },
+                                        child: Text('${e.name} #${e.memo}',
+                                            style: TextStyle(fontSize: 14))
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _assetNm = value;
+                                    });
+                                  },
+                                );
+                              }),
+                          )
                         ],
-                      )
+                      ),
+                      Row(
+                        children: [
+                          Text('금액'),
+                          SizedBox(width: 20),
+                          Expanded(
+                            child: TextFormField(
+                              style: TextStyle(fontSize: 14),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                hintText: 'ex) 50,000,000 원',
+                                contentPadding: EdgeInsets.all(10),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  borderSide:
+                                  BorderSide(color: Colors.black.withOpacity(0.3)),
+                                ),
+                              ),
+                              controller: _textPrice,
+                            ),
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -159,35 +165,40 @@ class _AddAssetDialogState extends State<AddAssetDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   TextButton(onPressed: () {
-                    if(_textName.text == ""){
+
+                    if(_assetId == -1){
                       Get.defaultDialog(
                           barrierDismissible: true,
                           title: '',
                           textCancel: '확인',
                           content: Center(
-                            child: Text('자산이름을 입력해 주세요.'),
-                          )
-                      );
-                      return;
-                    }
-                    if(_textTag.text == ""){
-                      Get.defaultDialog(
-                          barrierDismissible: true,
-                          title: '',
-                          textCancel: '확인',
-                          content: Center(
-                            child: Text('태그를 입력해 주세요.'),
+                            child: Text('자산을 선택해 주세요.'),
                           )
                       );
                       return;
                     }
 
-                    _assetController.insertAssetInfo(new AssetInfo(
-                      isFavorite: _isFavorite,
-                      name: _textName.text,
-                      memo: _textTag.text,
-                      type: _assetTypeList.indexOf(_assetType) + 1
-                    ));
+                    if(_textPrice.text == ""){
+                      Get.defaultDialog(
+                          barrierDismissible: true,
+                          title: '',
+                          textCancel: '확인',
+                          content: Center(
+                            child: Text('금액을 입력해 주세요.'),
+                          )
+                      );
+                      return;
+                    }
+
+                    DailyCost dailyCost = new DailyCost(
+                      price: int.parse(_textPrice.text),
+                      assetId: _assetId,
+                      categoryId: -1,
+                      type: 1,
+                      date: '000000000000',
+                      title: '초기자본'
+                    );
+                    _assetController.insertBaseAssetInfo(dailyCost);
                     Get.back();
                   }, child: Text('추가', style: TextStyle(color: Colors.blue)) ),
                   TextButton(onPressed: () => Get.back(), child: Text('취소')),

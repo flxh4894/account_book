@@ -117,18 +117,44 @@ class SmsAssetMatchPage extends StatelessWidget {
       elevation: 0,
       backgroundColor: Colors.white,
       actions: [
-        TextButton(onPressed: (){
-          showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) {
-                return SmsAssetMatchDialog();
-              }
-          );
-        }, child: Text('추가하기')),
+        PopupMenuButton(
+          icon: Icon(Icons.more_horiz),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+                value: 0,
+                child: Text('추가하기')
+            ),
+            PopupMenuItem(
+                value: 1,
+                child: Text('삭제하기')
+            ),
+          ],
+          onSelected: (item) {
+            _menuActions(item);
+          },
+        )
+        // TextButton(onPressed: (){
+        //   showDialog(
+        //       barrierDismissible: false,
+        //       context: context,
+        //       builder: (context) {
+        //         return SmsAssetMatchDialog();
+        //       }
+        //   );
+        // }, child: Text('추가하기')),
       ],
-
     );
+  }
+
+  void _menuActions(int item) {
+    switch(item){
+      case 0:
+        Get.dialog(SmsAssetMatchDialog());
+        break;
+      case 1:
+        Get.to(() => SmsAssetMatchEditPage());
+        break;
+    }
   }
 
   Widget _rowTile(int id, String text, String card, String tag, BuildContext context) {

@@ -1,8 +1,11 @@
 import 'package:accountbook/src/helper/db_helper.dart';
 import 'package:accountbook/src/model/asset_info.dart';
+import 'package:accountbook/src/model/daily_cost.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqlite_api.dart';
 
+enum BaseAsset {Cash, Bank, Invest, Loan, Else}
 class AssetController extends GetxController {
 
   static Database _database;
@@ -13,12 +16,15 @@ class AssetController extends GetxController {
   }
 
   RxList<AssetInfo> assetInfoList = <AssetInfo>[].obs;
+  RxList<AssetInfo> baseAssetList = <AssetInfo>[].obs;
+  RxMap<int, dynamic> baseAssetSumList = <int, dynamic>{}.obs;
   RxString assetNm = ''.obs;
   RxInt assetId = (-1).obs;
   RxBool deleteFlag = false.obs;
 
   @override
   void onInit() {
+    selectBaseAssetGroup(); // 초기 자본금 합계 불러오기
     getAssetInfoList();
     super.onInit();
   }
@@ -79,4 +85,67 @@ class AssetController extends GetxController {
       deleteFlag(false);
   }
 
+  // 선택 자산 목록 가져오기 (나의자산 +버튼 => 은행, 투자, 대출 등 특정 자산목록만)
+  void selectBaseAssetList(int type) async {
+    final db = await database;
+    var list = await db.query("assets", orderBy: "is_favorite DESC", where: "id != ? AND type = ?", whereArgs: [-1, type]);
+    baseAssetList( list.map((e) => AssetInfo.fromJson(e)).toList() );
+
+    baseAssetList.forEach((element) {
+      print(element.toMap());
+    });
+  }
+
+  // 선택 자산목록 삽입 - (나의 자산 분류별 금액 입력)
+  void insertBaseAssetInfo(DailyCost dailyCost) async {
+    final db = await database;
+    print(dailyCost.toMap());
+
+    var list = await db.query("daily_cost", where: "asset_id = ? AND date = ?", whereArgs: [dailyCost.assetId, "000000000000"]);
+    if(list.length == 0){
+      db.insert("daily_cost", dailyCost.toMap());
+    } else {
+      db.update("daily_cost", dailyCost.toMapNoId(), where: "id = ?", whereArgs: [list[0]['id']] );
+    }
+
+    selectBaseAssetGroup();
+  }
+
+  // 초기자산 그룹화 출력 - (나의 자산 분류별 금액)
+  void selectBaseAssetGroup() async {
+    final db = await database;
+
+    var list = await db.rawQuery(
+        "SELECT "
+            "B.type, "
+            "sum(A.price) AS price "
+            "FROM "
+            "daily_cost A, "
+            "assets B "
+            "WHERE "
+            "A.asset_id = B.id "
+            "GROUP BY B.type "
+    );
+
+    Map<int, dynamic> data = Map.fromIterable(list, key: (e) => e['type'], value: (e) => e['price']);
+    baseAssetSumList(data);
+  }
+
+  Future<List> selectAssetTypeList(int type) async {
+    final db = await database;
+    var list = await db.rawQuery(
+        "SELECT "
+            "B.name AS name, "
+            "B.memo AS tag, "
+            "sum(price) AS price "
+        "FROM "
+            "daily_cost A, "
+            "assets B "
+        "WHERE "
+            "A.asset_id = B.id "
+            "AND B.type = $type "
+        "GROUP BY A.asset_id");
+
+    return list;
+  }
 }

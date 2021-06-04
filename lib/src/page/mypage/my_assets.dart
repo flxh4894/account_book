@@ -1,15 +1,24 @@
-import 'package:accountbook/src/component/dialog/asset_dialog.dart';
+import 'package:accountbook/src/component/dialog/base_asset_dialog.dart';
+import 'package:accountbook/src/controller/asset_controller.dart';
+import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MyAssetsPage extends StatefulWidget {
-
   @override
   _MyAssetsPageState createState() => _MyAssetsPageState();
 }
 
 class _MyAssetsPageState extends State<MyAssetsPage> {
-  Widget _rowTile(String title, Widget widget) {
+  final AssetController _assetController = Get.put(AssetController());
+  final CommonUtils _utils = CommonUtils();
+
+  Widget _rowTile(String title, Widget widget, int type) {
+    String price = _assetController.baseAssetSumList[type] == null ?
+    _utils.priceFormat(0) :
+    _utils.priceFormat(_assetController.baseAssetSumList[type]);
     widget = widget == null ? Container() : widget;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16,vertical: 10),
       margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
@@ -35,52 +44,67 @@ class _MyAssetsPageState extends State<MyAssetsPage> {
                 children: [
                   Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(width:15),
-                  _addAssetBtn()
+                  _addAssetBtn(type)
                 ],
               ),
-              Text("28,000,000 원", style: TextStyle(color: Colors.red))
+              Text("$price", style: TextStyle(color: Colors.red))
             ],
           ),
           SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('- 키움증권'),
-              Text("12,000,000 원")
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('- 미래에셋증권'),
-              Text("16,000,000 원")
-            ],
-          ),
-          widget
+          _assetRowTile(type)
         ],
       ),
     );
   }
 
+  Widget _assetRowTile(int type) {
+    return FutureBuilder(
+      future: _assetController.selectAssetTypeList(type),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if(snapshot.data.length >= 0){
+          return Container(
+            child: Column(
+              children: [
+                for(var asset in snapshot.data)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('- ${asset['name']} #${asset['tag']}'),
+                      Text("${_utils.priceFormat(asset['price'])}")
+                    ],
+                  )
+              ],
+            ),
+          );
+        } else {
+          return Container();
+        }
+      }
+    );
+
+  }
+
   Widget _body() {
-    return Column(
-      children: [
-        _rowTile('현금', null),
-        _rowTile('은행', null),
-        _rowTile('투자', null),
-        _rowTile('대출', null),
-      ],
+    return SingleChildScrollView(
+      child: Obx(
+        () => Column(
+          children: [
+            _rowTile('현금', null, 1),
+            _rowTile('은행', null, 2),
+            _rowTile('투자', null, 4),
+            _rowTile('대출', null, 5),
+            _rowTile('기타', null, 6),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _addAssetBtn() {
+  Widget _addAssetBtn(int type) {
     return GestureDetector(
       onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AssetDialog();
-            }
+        Get.dialog(
+          AddBaseAssetDialog(assetType: type)
         );
       },
       child: Icon(Icons.add, color: Colors.red,)

@@ -41,4 +41,13 @@ class DailyCost {
         'price': price,
         'date': date,
       };
+
+  Map<String, dynamic> toMapNoId() => {
+    'category': categoryId,
+    'title': title,
+    'asset_id': assetId,
+    'asset_type': type,
+    'price': price,
+    'date': date,
+  };
 }

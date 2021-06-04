@@ -15,7 +15,8 @@ class _SmsAssetMatchEditPageState extends State<SmsAssetMatchEditPage> {
 
   @override
   void initState() {
-    _selected.add(Get.arguments);
+    if(Get.arguments != null)
+      _selected.add(Get.arguments);
     super.initState();
   }
 
