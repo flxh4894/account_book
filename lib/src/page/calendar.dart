@@ -2,6 +2,7 @@ import 'package:accountbook/src/component/datePicker.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/page/calendar/calendar_edit.dart';
+import 'package:accountbook/src/page/calendar/calendar_search.dart';
 import 'package:accountbook/src/page/calendar/day_calendar.dart';
 import 'package:accountbook/src/page/calendar/month_calendar.dart';
 import 'package:accountbook/src/page/new_cost.dart';
@@ -22,10 +23,13 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget _appbar() {
     return AppBar(
       elevation: 0,
-      centerTitle: true,
       backgroundColor: Colors.white,
       title: datePicker(),
       actions: [
+        IconButton(
+          onPressed: ()=>Get.to(() => CalendarSearchPage()),
+          icon: Icon(Icons.search)
+        ),
         PopupMenuButton(
           icon: Icon(Icons.more_horiz),
           itemBuilder: (context) => [
@@ -96,7 +100,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Widget datePicker() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
       ),

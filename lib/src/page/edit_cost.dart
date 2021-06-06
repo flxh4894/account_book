@@ -19,7 +19,8 @@ class _EditCostPageState extends State<EditCostPage> {
   final textTitle = TextEditingController();
   final CommonUtils _utils = CommonUtils();
   final CostController _costController = Get.find<CostController>();
-  DailyCost content = Get.arguments;
+  DailyCost content = Get.arguments['content'];
+  Function callBack = Get.arguments['callBack'];
 
   DateTime now;
   TimeOfDay picked;
@@ -377,7 +378,8 @@ class _EditCostPageState extends State<EditCostPage> {
                 title: '',
                 textConfirm: '삭제',
                 onConfirm: () {
-                  _costController.removeCostContent([id]);
+                  _costController.removeCostContent([id]); // 삭제
+                  callBack(content); // 콜백(페이지별로 다름 return DailyCost)
                   Get.back();
                 },
                 confirmTextColor: Colors.white,
@@ -466,7 +468,6 @@ class _EditCostPageState extends State<EditCostPage> {
               categoryId: categoryId
             );
 
-            print(dailyCost.toMap());
             _costController.updateCostContent(dailyCost);
           },
           child: Text(

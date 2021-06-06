@@ -1,4 +1,5 @@
 import 'package:accountbook/src/controller/cost_controller.dart';
+import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/model/daily_cost.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,10 @@ class _CalendarEditPageState extends State<CalendarEditPage> {
   List<int> selectedList = <int>[];
   int total = 0;
 
+  void deleteCallback() {
+    DateTime date = Get.find<UtilController>().date;
+    _costController.getMonthCostContent(date);
+  }
 
   @override
   void initState() {
@@ -46,6 +51,7 @@ class _CalendarEditPageState extends State<CalendarEditPage> {
             icon: Icon(Icons.delete_outlined),
             onPressed: () {
               _costController.removeCostContent(selectedList);
+              deleteCallback();
             }
         ),
       ],

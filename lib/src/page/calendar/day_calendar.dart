@@ -1,4 +1,5 @@
 import 'package:accountbook/src/controller/cost_controller.dart';
+import 'package:accountbook/src/controller/util_controller.dart';
 import 'package:accountbook/src/model/daily_cost.dart';
 import 'package:accountbook/src/page/calendar/calendar_edit.dart';
 import 'package:accountbook/src/page/edit_cost.dart';
@@ -14,6 +15,23 @@ class DailyCalendarPage extends StatefulWidget {
 class _DailyCalendarPageState extends State<DailyCalendarPage> {
   final CostController _costController = Get.find<CostController>();
   final CommonUtils _utils = CommonUtils();
+
+  // 삭제 후 콜백 처리
+  void deleteCallback(DailyCost dailyCost) {
+    var day = dailyCost.date.substring(6,8);
+
+    _costController.dailyCostList[day].remove(dailyCost);
+    _costController.dailyCostList.refresh();
+
+    if (dailyCost.type == 1)
+      _costController.monthTotalPlus(_costController.monthTotalPlus.value - dailyCost.price);
+    else if (dailyCost.type == 2)
+      _costController.monthTotalMinus(_costController.monthTotalMinus.value - dailyCost.price);
+    else
+      _costController.monthTotalInvest(_costController.monthTotalInvest.value - dailyCost.price);
+
+    _costController.setAssetList();
+  }
 
   Widget _dayListTile(String day, List<DailyCost> list) {
     var totalMinus = 0;
@@ -89,7 +107,7 @@ class _DailyCalendarPageState extends State<DailyCalendarPage> {
         splashColor: Colors.transparent,
         highlightColor: Theme.of(context).primaryColor.withOpacity(0.2),
         onTap: () {
-          Get.to(() => EditCostPage(), arguments: content);
+          Get.to(() => EditCostPage(), arguments: {'content': content, 'callBack': deleteCallback});
         },
         onLongPress: () {
           Get.to(() => CalendarEditPage(),
@@ -148,6 +166,7 @@ class _DailyCalendarPageState extends State<DailyCalendarPage> {
           itemBuilder: (context, index) {
             List<String> keys = _costController.dailyCostList.keys.toList();
 
+            // Last 일 때 Bottom 에 Padding 을 주기 위함
             if(index != _costController.dailyCostList.length - 1)
               return _dayListTile(keys[index], _costController.dailyCostList[keys[index]]);
             else

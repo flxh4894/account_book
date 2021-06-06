@@ -148,7 +148,7 @@ class CostController extends GetxController {
       batch.rawDelete("DELETE FROM daily_cost WHERE id = $id");
 
     await batch.commit();
-    await getMonthCostContent(_utilController.date);
+    // await getMonthCostContent(_utilController.date);
     Get.back();
   }
 
