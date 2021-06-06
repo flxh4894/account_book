@@ -25,16 +25,23 @@ class SmsController extends GetxController{
 
   @override
   void onInit() {
-    _getReceiveFlag();
-    getLastSmsDate();
-    selectSmsAssetList();
+    init();
     super.onInit();
   }
 
+  // 초기함수 모음
+  void init() async {
+    await _getReceiveFlag(); // 메세지 자동수신 Flag 가져오기
+    await _selectSmsAssetList(); // 문구별 자동 연동 리스트 가져오기
+    _getLastSmsDate(); // 마지막 메세직보다 나중에 온 메세지들 읽어오기
+  }
+
   // SMS 자동 수신 Flag 가져오기
-  void _getReceiveFlag() async {
+  Future<bool> _getReceiveFlag() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     receiveFlag( prefs.getBool("flag") );
+
+    return true;
   }
 
   // SMS 자동 수신 Flag 설정하기
@@ -44,18 +51,18 @@ class SmsController extends GetxController{
     receiveFlag( flag );
   }
 
-  // 메세지 받았을 때
+  // 메세지 받았을 때 문자 처리
   void receiveSms(SmsMessage msg) {
     // 문자를 받겠다고 설정한 경우에만
     if(receiveFlag.value){
       smsList.clear();
       _setSmsMessage(msg);
-      insertSmsContent(smsList);
+      _insertSmsContent(smsList);
     }
   }
 
-  // 마지막 메세지 가져오기
-  void getLastSmsDate() async {
+  // 마지막 메세지보다 나중 문자들 가져오기
+  Future<bool> _getLastSmsDate() async {
     if(receiveFlag.value){
       final db = await database;
       var list = await db.query("daily_cost", orderBy: "date DESC", limit: 1);
@@ -74,10 +81,11 @@ class SmsController extends GetxController{
             _setSmsMessage(element);
           }
         });
-
-        // insertSmsContent(smsList);
+        _insertSmsContent(smsList);
       }
     }
+
+    return true;
   }
 
   // SMS 파싱 및 list add
@@ -111,8 +119,6 @@ class SmsController extends GetxController{
       }
     });
 
-    print(assetId);
-
     smsList.add(
         AssetContent(
             date: date,
@@ -143,7 +149,7 @@ class SmsController extends GetxController{
         }
       });
 
-      insertSmsContent(smsList);
+      _insertSmsContent(smsList);
 
       Get.back();
       Get.snackbar("SMS 가져오기", "${smsList.length}건 가져오기 성공",
@@ -202,7 +208,7 @@ class SmsController extends GetxController{
   }
 
   // SMS 내용 파싱해서 저장
-  void insertSmsContent(List<AssetContent> list) async {
+  void _insertSmsContent(List<AssetContent> list) async {
     final db = await database;
     Batch batch = db.batch();
 
@@ -222,18 +228,8 @@ class SmsController extends GetxController{
     _costController.getMonthCostContent(DateTime.now());
   }
 
-  // SMS 문구별 자산 연동 삽입
-  void insertSmsAssetList(String word, int assetId) async {
-    final db = await database;
-    
-    int id = await db.insert("sms_asset_matcher", {"word": word, "asset_id": assetId});
-    print("SMS 자산 아이디 : $id");
-    selectSmsAssetList();
-
-  }
-
-  // SMS 문구별 자산 연동 가져오기
-  void selectSmsAssetList() async {
+  // SMS 문구별 자산 연동 리스트 가져오기
+  Future<bool> _selectSmsAssetList() async {
     final db = await database;
 
     var list = await db.rawQuery(
@@ -249,6 +245,14 @@ class SmsController extends GetxController{
     );
 
     smsAssetList( list.map((e) => SmsAssetList.fromJson(e)).toList() );
+    return true;
+  }
+
+  // SMS 문구별 자산 연동 삽입
+  void insertSmsAssetList(String word, int assetId) async {
+    final db = await database;
+    await db.insert("sms_asset_matcher", {"word": word, "asset_id": assetId});
+    _selectSmsAssetList(); // 리로드
   }
 
   // SMS 문구별 자산 연동 삭제
@@ -260,7 +264,7 @@ class SmsController extends GetxController{
       batch.delete("sms_asset_matcher", where: "id = ?", whereArgs: [element]);
     });
     batch.commit();
-    selectSmsAssetList();
+    _selectSmsAssetList();
 
     Get.back();
   }

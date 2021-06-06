@@ -21,7 +21,7 @@ class MyPage extends StatelessWidget {
         _rowTile('나의 자산', Icons.assessment_outlined, MyAssetsPage()),
         _rowTile('SMS 설정', Icons.email_outlined, SmsSettingsPage()),
         _rowTile('은행 및 카드관리', Icons.paid_outlined, AssetManagementPage()),
-        _rowTile('설정', Icons.settings_outlined, null),
+        _rowTile('설정(미구현)', Icons.settings_outlined, null),
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:accountbook/src/controller/asset_controller.dart';
+import 'package:accountbook/src/page/mypage/sms/sms_asset_match.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'add_asset_dialog.dart';
@@ -27,7 +28,7 @@ class _SmsDialogState extends State<SmsDialog> {
           height: MediaQuery
               .of(context)
               .size
-              .height * 0.3,
+              .height * 0.35,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -68,6 +69,23 @@ class _SmsDialogState extends State<SmsDialog> {
                       Text("일 이내의 문자 가져오기")
                     ],
                   )
+              ),
+              Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('잠깐!'),
+                    GestureDetector(
+                        child: Text('문구별 자산 연동', style: TextStyle(color: Colors.blue, fontSize: 18)),
+                        onTap: () {
+                          print('click');
+                          Get.back();
+                          Get.to(() => SmsAssetMatchPage());
+                        }
+                    ),
+                    Text(' 설정 하셨나요?'),
+                  ],
+                )
               ),
               Container(
                 child: Center(

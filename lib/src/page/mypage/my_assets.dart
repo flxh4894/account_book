@@ -61,7 +61,7 @@ class _MyAssetsPageState extends State<MyAssetsPage> {
     return FutureBuilder(
       future: _assetController.selectAssetTypeList(type),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if(snapshot.data.length >= 0){
+        if(snapshot.data != null){
           return Container(
             child: Column(
               children: [

@@ -1,6 +1,7 @@
 import 'package:accountbook/src/component/datePicker.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
+import 'package:accountbook/src/page/calendar/calendar_edit.dart';
 import 'package:accountbook/src/page/calendar/day_calendar.dart';
 import 'package:accountbook/src/page/calendar/month_calendar.dart';
 import 'package:accountbook/src/page/new_cost.dart';
@@ -24,6 +25,20 @@ class _CalendarPageState extends State<CalendarPage> {
       centerTitle: true,
       backgroundColor: Colors.white,
       title: datePicker(),
+      actions: [
+        PopupMenuButton(
+          icon: Icon(Icons.more_horiz),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+                value: 1,
+                child: Text('삭제하기')
+            ),
+          ],
+          onSelected: (item) {
+            _menuActions(item);
+          },
+        )
+      ],
       bottom: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight+50),
         child: Column(
@@ -69,6 +84,14 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
       ),
     );
+  }
+
+  void _menuActions(int item) {
+    switch(item){
+      case 1:
+        Get.to(() => CalendarEditPage(), transition: Transition.noTransition);
+        break;
+    }
   }
 
   Widget datePicker() {

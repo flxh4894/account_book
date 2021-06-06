@@ -152,7 +152,7 @@ class SmsAssetMatchPage extends StatelessWidget {
         Get.dialog(SmsAssetMatchDialog());
         break;
       case 1:
-        Get.to(() => SmsAssetMatchEditPage());
+        Get.to(() => SmsAssetMatchEditPage(), transition: Transition.noTransition);
         break;
     }
   }
@@ -160,7 +160,6 @@ class SmsAssetMatchPage extends StatelessWidget {
   Widget _rowTile(int id, String text, String card, String tag, BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
-      height: 60,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),

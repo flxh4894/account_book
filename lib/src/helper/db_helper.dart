@@ -80,7 +80,9 @@ class DatabaseHelper {
           PRIMARY KEY("id" AUTOINCREMENT)
         )'''
       );
-    }, onUpgrade: (db, oldVersion, newVersion) {
+    }, onUpgrade: (db, oldVersion, newVersion) async {
+      await initCategory(db);
+
       return db.execute('''
         CREATE TABLE "sms_asset_matcher" (
           "id"	INTEGER,
@@ -94,8 +96,6 @@ class DatabaseHelper {
 
   // 카테고리 초기화
   Future initCategory(Database db) async {
-    print("카테고리 초기화");
-
     Batch batch = db.batch();
 
     String sql = await rootBundle.loadString("assets/sql/init_data.sql");

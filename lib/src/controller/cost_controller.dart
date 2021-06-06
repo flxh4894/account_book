@@ -28,7 +28,7 @@ class CostController extends GetxController {
   }
 
   void init() async {
-    await getMonthCostContent(_utilController.date);
+    getMonthCostContent(_utilController.date);
     getCategoryList();
   }
 

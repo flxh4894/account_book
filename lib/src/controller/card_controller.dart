@@ -18,7 +18,6 @@ class CardController extends GetxController {
 
   @override
   void onInit() {
-    getCreditCardList();
     super.onInit();
   }
 
@@ -32,7 +31,7 @@ class CardController extends GetxController {
     final yearMonth = '$year$month';
 
     // ** 초기화
-    cardList.clear(); // 카드리스트
+    cardList.clear();
     okay(0); // 달성
     yet(0); // 미달성
     var list = await db.query("credit_card");
@@ -46,6 +45,7 @@ class CardController extends GetxController {
       );
       int price = dbPrice[0]['price'];
 
+      // 카드정보
       cardList.add(
         new CreditCard(
           id: element['id'],

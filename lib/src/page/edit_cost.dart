@@ -21,8 +21,8 @@ class _EditCostPageState extends State<EditCostPage> {
   final CostController _costController = Get.find<CostController>();
   DailyCost content = Get.arguments;
 
-  DateTime now = DateTime.now();
-  TimeOfDay picked = TimeOfDay.now();
+  DateTime now;
+  TimeOfDay picked;
   String hour = '';
   String min = '';
   String title = '지출';
@@ -56,7 +56,7 @@ class _EditCostPageState extends State<EditCostPage> {
     hour = picked.hour < 10 ? '0${picked.hour.toString()}' : picked.hour.toString();
     min = picked.minute < 10 ? '0${picked.minute.toString()}' : picked.minute.toString();
     textDate.text =
-        '${_utils.getDate(DateTime.now())} (${_utils.getDay(DateTime.now())})';
+        '${_utils.getDate(now)} (${_utils.getDay(DateTime.now())})';
     super.initState();
   }
 
@@ -341,15 +341,17 @@ class _EditCostPageState extends State<EditCostPage> {
               onTap: () {
                 showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: now,
                         firstDate: DateTime(1990),
                         lastDate: DateTime(2100))
                     .then((value) {
-                  setState(() {
-                    now = value;
-                    textDate.text =
-                        '${_utils.getDate(now)} (${_utils.getDay(now)})';
-                  });
+                      if(value != null){
+                        setState(() {
+                          now = value;
+                          textDate.text =
+                          '${_utils.getDate(now)} (${_utils.getDay(now)})';
+                        });
+                      }
                 });
               },
               child: Container(

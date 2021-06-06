@@ -19,12 +19,20 @@ class _CalendarEditPageState extends State<CalendarEditPage> {
 
   @override
   void initState() {
-    selectedList.add(Get.arguments['id']);
-    var type = 1;
-    if(Get.arguments['type'] == 2){
-      type = -1;
+    // 메뉴를 통해 진입한게 아닌 경우
+    if(Get.arguments != null){
+      selectedList.add(Get.arguments['id']);
+
+      // 초기 선택 값이 지출인지 소득인지 구분
+      // 1: 소득, 2: 지출
+      // Total 금액을 산정하기 위함
+      var type = 1;
+      if(Get.arguments['type'] == 2){
+        type = -1;
+      }
+      total += Get.arguments['price'] * type;
     }
-    total += Get.arguments['price'] * type;
+
     super.initState();
   }
 
@@ -40,10 +48,6 @@ class _CalendarEditPageState extends State<CalendarEditPage> {
               _costController.removeCostContent(selectedList);
             }
         ),
-        IconButton(
-            icon: Icon(Icons.more_horiz),
-            onPressed: () {}
-        )
       ],
     );
   }

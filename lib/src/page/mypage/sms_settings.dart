@@ -70,7 +70,6 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
       ),
       body: Container(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _rowTile('SMS 가져오기',
                 GestureDetector(
@@ -98,10 +97,10 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
                   ),
                 )
             ),
-            GestureDetector(
-              onTap: () => Get.to(() => IgnoreSmsListPage()),
-              child: _rowTile('연동 제외 번호 설정', null)
-            ),
+            // GestureDetector(
+            //   onTap: () => Get.to(() => IgnoreSmsListPage()),
+            //   child: _rowTile('연동 제외 번호 설정', null)
+            // ),
             GestureDetector(
               onTap: () => Get.to(() => SmsAssetMatchPage()),
               child: _rowTile('문구별 자산 연결', null)),

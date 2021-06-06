@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Text('자세히(미구현!!!)', style: TextStyle(color: Colors.black.withOpacity(0.5)))
+          // Text('자세히(미구현!!!)', style: TextStyle(color: Colors.black.withOpacity(0.5)))
         ],
       ),
     );
@@ -149,16 +149,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         elevation: 0,
         title: Text('홈', style: TextStyle(fontSize: 20)),
-        actions: [
-          Row(
-            children: [
-              Icon(Icons.import_export),
-              SizedBox(width: 10),
-              Icon(Icons.menu),
-              SizedBox(width: 16),
-            ],
-          )
-        ],
       ),
       body: _body(),
     );
