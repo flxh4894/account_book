@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UtilController extends GetxController {
@@ -30,4 +31,17 @@ class UtilController extends GetxController {
 
     _date(dateTime);
   }
+
+  Future<bool> permissionCheck() async {
+    bool per = true;
+    Map<Permission, PermissionStatus> list = await [Permission.sms].request();
+
+    list.forEach((key, value) {
+      if(!value.isGranted){
+        per = false;
+      }
+    });
+    return per;
+  }
+
 }

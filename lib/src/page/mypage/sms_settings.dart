@@ -1,10 +1,10 @@
+import 'package:accountbook/src/admob/ad_banner.dart';
 import 'package:accountbook/src/component/dialog/sms_dialog.dart';
 import 'package:accountbook/src/controller/sms_controller.dart';
-import 'package:accountbook/src/page/mypage/sms/ignore_sms.dart';
 import 'package:accountbook/src/page/mypage/sms/sms_asset_match.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SmsSettingsPage extends StatefulWidget {
@@ -28,7 +28,13 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
 
   @override
   void initState() {
-    _permissionCheck().then((value) => print(value));
+    _permissionCheck().then((value) {
+      if(value == false){
+
+      } else {
+
+      }
+    });
     super.initState();
   }
 
@@ -104,6 +110,8 @@ class _SmsSettingsPageState extends State<SmsSettingsPage> {
             GestureDetector(
               onTap: () => Get.to(() => SmsAssetMatchPage()),
               child: _rowTile('문구별 자산 연결', null)),
+            Expanded(child: Container()),
+            AdMobBannerAd(adSize: AdSize.largeBanner)
           ],
         ),
       ),

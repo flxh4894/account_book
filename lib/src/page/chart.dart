@@ -110,7 +110,7 @@ class ChartPage extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
-          ListRowComponent('5월 총액', total, 1),
+          ListRowComponent('${_chartController.date.month}월 총액', total, 1),
           for(CategoryInfo category in list)
             ListRowComponent(category.name, category.price * flag, 1)
         ],

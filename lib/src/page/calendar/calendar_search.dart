@@ -1,3 +1,4 @@
+import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/search_controller.dart';
 import 'package:accountbook/src/model/asset_content.dart';
 import 'package:accountbook/src/model/daily_cost.dart';
@@ -17,6 +18,7 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
   final CommonUtils _utils = CommonUtils();
 
   final SearchController _searchController = Get.put(SearchController());
+  final CostController _costController = Get.find<CostController>();
 
   String _displayOption(AssetContent option) => option.title;
 
@@ -27,6 +29,36 @@ class _CalendarSearchPageState extends State<CalendarSearchPage> {
     if(_searchController.dailyCostList.length == 0){
       _searchController.getAllAccountBook();
     }
+
+    _updateContentList(dailyCost);
+  }
+
+  // 삭제 후 목록 업데이트
+  void _updateContentList(DailyCost dailyCost) {
+    var day = dailyCost.date.substring(6,8);
+
+    // 해당 일에 값이 있는 경우에만 확인
+    if(_costController.dailyCostList[day] != null){
+      var index = -1;
+      for(var element in _costController.dailyCostList[day]){
+        if(element.id == dailyCost.id){
+          index = _costController.dailyCostList[day].indexOf(element);
+          _costController.dailyCostList[day].removeAt(index);
+          _costController.dailyCostList.refresh();
+
+          if (dailyCost.type == 1)
+            _costController.monthTotalPlus(_costController.monthTotalPlus.value - dailyCost.price);
+          else if (dailyCost.type == 2)
+            _costController.monthTotalMinus(_costController.monthTotalMinus.value - dailyCost.price);
+          else
+            _costController.monthTotalInvest(_costController.monthTotalInvest.value - dailyCost.price);
+
+          _costController.setAssetList();
+          break;
+        }
+      }
+    }
+    
   }
 
   @override

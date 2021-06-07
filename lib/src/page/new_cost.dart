@@ -1,4 +1,5 @@
 
+import 'package:accountbook/src/admob/ad_banner.dart';
 import 'package:accountbook/src/component/calculator.dart';
 import 'package:accountbook/src/component/dialog/asset_dialog.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
@@ -6,6 +7,7 @@ import 'package:accountbook/src/model/asset_content.dart';
 import 'package:accountbook/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 
 class NewCostPage extends StatefulWidget {
@@ -69,6 +71,7 @@ class _NewCostPageState extends State<NewCostPage> {
             _costInfo(),
             SizedBox(height: 20),
             _saveButton(),
+            AdMobBannerAd(adSize: AdSize.largeBanner)
           ],
         ),
       ),

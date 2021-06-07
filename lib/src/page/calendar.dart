@@ -1,3 +1,4 @@
+import 'package:accountbook/src/admob/ad_banner.dart';
 import 'package:accountbook/src/component/datePicker.dart';
 import 'package:accountbook/src/controller/cost_controller.dart';
 import 'package:accountbook/src/controller/util_controller.dart';
@@ -129,11 +130,18 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Widget _body() {
-    return TabBarView(
-        children: [
-          DailyCalendarPage(),
-          MonthCalendarPage()
-        ]
+    return Column(
+      children: [
+        Expanded(
+          child: TabBarView(
+            children: [
+              DailyCalendarPage(),
+              MonthCalendarPage()
+            ]
+          ),
+        ),
+        AdMobBannerAd()
+      ]
     );
   }
 
@@ -144,10 +152,14 @@ class _CalendarPageState extends State<CalendarPage> {
       child: Scaffold(
         appBar: _appbar(),
         body: _body(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => Get.to(() => NewCostPage()),
-          child: Icon(Icons.add, color: Colors.white),
+        floatingActionButton: Padding(
+          padding: EdgeInsets.symmetric(vertical: 50),
+          child: FloatingActionButton(
+            onPressed: () => Get.to(() => NewCostPage()),
+            child: Icon(Icons.add, color: Colors.white),
+          ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat
       ),
     );
   }

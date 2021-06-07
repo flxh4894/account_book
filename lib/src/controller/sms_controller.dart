@@ -75,12 +75,12 @@ class SmsController extends GetxController{
         var dbList = await query.getAllSms;
 
         smsList.clear();
-        dbList.forEach((element) {
+        for(SmsMessage element in dbList) {
           var date = DateFormat('yyyyMMddHHmm').format(element.date);
           if( int.parse(date) > int.parse(lastDate) ){
             _setSmsMessage(element);
           }
-        });
+        }
         _insertSmsContent(smsList);
       }
     }
@@ -97,6 +97,7 @@ class SmsController extends GetxController{
     if(price == null
         || msg.body.contains("승인거절")
         || msg.body.contains("인증번호")
+        || msg.body.contains("(광고)")
         || timeDate == null
     ) {
       return;
@@ -112,12 +113,12 @@ class SmsController extends GetxController{
     price = price.replaceAll(",", "").replaceAll("원", "");
 
     var assetId = -1;
-    smsAssetList.forEach((element) {
-      if(msg.body.contains(element.word)){
-        assetId = element.id;
-        return;
+    for(SmsAssetList asset in smsAssetList){
+      if(msg.body.contains(asset.word)){
+        assetId = asset.id;
+        break;
       }
-    });
+    }
 
     smsList.add(
         AssetContent(
@@ -133,7 +134,6 @@ class SmsController extends GetxController{
 
   // 네이티브에서 메세지 모두 가져오기
   void getNativeValue(int day) async {
-    String value;
     try {
       SmsQuery query = new SmsQuery();
       String selectedDay = DateFormat('yyyyMMdd').format(
@@ -149,30 +149,18 @@ class SmsController extends GetxController{
         }
       });
 
-      _insertSmsContent(smsList);
-
+      int count = await _insertSmsContent(smsList);
       Get.back();
-      Get.snackbar("SMS 가져오기", "${smsList.length}건 가져오기 성공",
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar("SMS 가져오기", "$count건 가져오기 성공",
+          snackPosition: SnackPosition.TOP);
 
     } on PlatformException catch (e) {
-      value = '네이티브 에러 : ${e.message}';
+      Get.back();
+      Get.snackbar("SMS 가져오기", "가져오기에 실패하였습니다.",
+          snackPosition: SnackPosition.TOP);
+
     }
   }
-
-  // 네이티브에서 직접 가지고 오는 방법
-  // Future<void> getSmsAllMessage(int a) async {
-  //   String batteryLevel;
-  //   try {
-  //     List result = await platform.invokeMethod('getValue');
-  //     result.forEach((element) {
-  //       print(element);
-  //     });
-  //
-  //   } on PlatformException catch (e) {
-  //     batteryLevel = "Failed to get battery level: '${e.message}'.";
-  //   }
-  // }
 
   // 본문내용(결제한곳)파싱
   // 결제한 곳 파싱
@@ -208,24 +196,29 @@ class SmsController extends GetxController{
   }
 
   // SMS 내용 파싱해서 저장
-  void _insertSmsContent(List<AssetContent> list) async {
+  Future<int> _insertSmsContent(List<AssetContent> list) async {
     final db = await database;
     Batch batch = db.batch();
+    int count = 0;
 
-    list.forEach((element) async {
+    for(AssetContent element in list) {
       var list = await db.query(
           "daily_cost",
           where: "price = ? and title = ? and date = ?",
           whereArgs: [element.price, element.title, element.date]
       );
 
-      if(list.length == 0) // 테이블에 해당 데이터가 없는 경우에 Insert
+      if(list.length == 0) { // 테이블에 해당 데이터가 없는 경우에 Insert
         batch.insert("daily_cost", element.toMap());
-    });
+        count ++;
+      }
+    }
 
     /* 커밋 후 다시 불러옴 */
     batch.commit();
     _costController.getMonthCostContent(DateTime.now());
+
+    return count;
   }
 
   // SMS 문구별 자산 연동 리스트 가져오기
@@ -234,7 +227,7 @@ class SmsController extends GetxController{
 
     var list = await db.rawQuery(
       "SELECT "
-          "B.id AS id, "
+          "A.id AS id, "
           "A.name AS card_nm, "
           "A.memo AS card_tag, "
           "B.word AS word "

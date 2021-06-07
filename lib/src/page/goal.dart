@@ -1,3 +1,4 @@
+import 'package:accountbook/src/admob/ad_banner.dart';
 import 'package:accountbook/src/component/dialog/year_goal_dialog.dart';
 import 'package:accountbook/src/controller/goal_controller.dart';
 import 'package:accountbook/src/model/invest_info.dart';
@@ -33,7 +34,8 @@ class _GoalPageState extends State<GoalPage> {
             _barChart(),
             _needAssets(),
             _currentSaveAssets(),
-            _myAssets()
+            _myAssets(),
+            AdMobBannerAd()
           ],
         ),
       ),

@@ -17,6 +17,7 @@ class _MyAssetsPageState extends State<MyAssetsPage> {
     String price = _assetController.baseAssetSumList[type] == null ?
     _utils.priceFormat(0) :
     _utils.priceFormat(_assetController.baseAssetSumList[type]);
+
     widget = widget == null ? Container() : widget;
 
     return Container(
