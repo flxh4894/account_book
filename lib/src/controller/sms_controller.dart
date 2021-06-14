@@ -67,7 +67,8 @@ class SmsController extends GetxController{
       final db = await database;
       var list = await db.query("daily_cost", orderBy: "date DESC", limit: 1);
       if(list.length == 0)
-        print('데이터가 없습니다.');
+        return true;
+        // print('데이터가 없습니다.');
       else {
         // 가장 마지막 저장된 가계부 정보의 날짜와 비교해서 뒤의 메모만 가져온다.
         String lastDate = AssetContent.fromJson(list[0]).date;

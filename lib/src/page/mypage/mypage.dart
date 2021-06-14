@@ -69,19 +69,18 @@ class _MyPageState extends State<MyPage> {
     return Column(
       children: [
         AdMobBannerAd(adSize: AdSize.largeBanner),
-        _rowTile('나의 자산', Icons.assessment_outlined, MyAssetsPage()),
-        _rowTile('SMS 설정', Icons.email_outlined, SmsSettingsPage()),
-        _rowTile('은행 및 카드관리', Icons.paid_outlined, AssetManagementPage()),
+        _rowTile('나의 자산', Icons.assessment_outlined, MyAssetsPage(), 0),
+        _rowTile('SMS 설정', Icons.email_outlined, SmsSettingsPage(), 1),
+        _rowTile('은행 및 카드관리', Icons.paid_outlined, AssetManagementPage(), 0),
         // _rowTile('설정(미구현)', Icons.settings_outlined, null),
       ],
     );
   }
 
-  Widget _rowTile(String title, IconData icon, Widget function) {
+  Widget _rowTile(String title, IconData icon, Widget function, int type) {
     return GestureDetector(
       onTap: () {
-          print(function.toString() == 'SmsSettingsPage');
-          if(function.toString() == 'SmsSettingsPage') {
+          if(type == 1) {
             Get.find<UtilController>().permissionCheck()
                 .then((value) {
               if(value == false){

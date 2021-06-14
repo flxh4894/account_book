@@ -31,9 +31,8 @@ class _AdMobBannerAdState extends State<AdMobBannerAd> {
 
   @override
   void initState() {
-    print(widget.adSize);
     myBanner = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // 광고 아이디 설정
+      adUnitId: 'ca-app-pub-3855736693913841/2765220710', // 광고 아이디 설정
       size: widget.adSize == null ? AdSize.banner : widget.adSize,
       request: AdRequest(),
       listener: BannerAdListener(),
